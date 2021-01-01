@@ -28,6 +28,8 @@ struct Playlist
     };
 
     std::variant<InputParams,HttpReq,Json> form;
+
+    Playlist(InputParams initialForm) : form(initialForm){}
 };
 
 /* UTILITIES */
@@ -69,10 +71,8 @@ struct Processes
 
 int main()
 {
-    Playlist playlist;
-
-    // initial form
-    playlist.form = {Playlist::InputParams{1000, Playlist::InputParams::Quality::GOOD, &playlist}};
+    // Playlist creation with its initial form
+    Playlist playlist({Playlist::InputParams{1000, Playlist::InputParams::Quality::GOOD, &playlist}});
 
     // print playlist form and process from InputParams to HttpReq
     std::visit(Processes{}, playlist.form);
