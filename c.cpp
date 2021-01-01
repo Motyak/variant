@@ -2,36 +2,84 @@
 #include <variant>
 #include <vector>
 
-struct Numbers
+struct Playlist
 {
-    std::vector<unsigned> n;
+    struct InputParams
+    {
+        enum Quality { BASIC, GOOD };
+        unsigned playlistId;
+        Quality quality;
+        Playlist* playlist;
+    };
+
+    struct HttpReq
+    {
+        enum Type { GET, POST };
+        Type type;
+        std::string url;
+        std::string data;
+        Playlist* playlist;
+    };
+
+    struct Json
+    {
+        std::string content;
+        Playlist* playlist;
+    };
+
+    std::variant<InputParams,HttpReq,Json> form;
 };
 
-using Text = std::variant<std::string,Numbers>;
+/* UTILITIES */
+void afficher(const Playlist::InputParams& params)
+{
+    std::cout<<params.playlistId<<";"<<params.quality<<std::endl<<std::endl;
+}
+void afficher(const Playlist::HttpReq& req)
+{
+    std::cout<<(int)req.type<<";"<<req.url<<";"<<req.data<<std::endl<<std::endl;
+}
+void afficher(const Playlist::Json& json)
+{
+    std::cout<<json.content<<std::endl;
+}
 
 struct Processes
 {
-    Numbers operator()(const std::string& text)
+    void operator()(Playlist::InputParams& params)
     {
-        std::cout<<"string to numbers"<<std::endl;
-        std::vector<unsigned> res;
-        for(const auto& c : text)
-            res.push_back((int)c);
-        return Numbers{res};
+        std::cout<<"InputParams:"<<std::endl;
+        afficher(std::get<Playlist::InputParams>(params.playlist->form));
+        params.playlist->form = {Playlist::HttpReq{Playlist::HttpReq::Type::GET, "url", "data", params.playlist}};
     }
 
-    Numbers operator()(const Numbers& text)
+    void operator()(Playlist::HttpReq& req)
     {
-        std::cout<<"do nothing"<<std::endl;
-        return Numbers{};
+        std::cout<<"HttpReq:"<<std::endl;
+        afficher(std::get<Playlist::HttpReq>(req.playlist->form));
+        req.playlist->form = {Playlist::Json{"content", req.playlist}};
+    }
+
+    void operator()(Playlist::Json& json)
+    {
+        std::cout<<"Json:"<<std::endl;
+        afficher(std::get<Playlist::Json>(json.playlist->form));
     }
 };
 
-
 int main()
 {
-    Text text{"test"};
-    text = std::visit(Processes{}, text);
-    for(const auto& e : std::get<Numbers>(text).n)
-        std::cout<<e<<std::endl;
+    Playlist playlist;
+
+    // initial form
+    playlist.form = {Playlist::InputParams{1000, Playlist::InputParams::Quality::GOOD, &playlist}};
+
+    // print playlist form and process from InputParams to HttpReq
+    std::visit(Processes{}, playlist.form);
+
+    // print playlist form and process from HttpReq to Json
+    std::visit(Processes{}, playlist.form);
+
+    // print playlist form
+    std::visit(Processes{}, playlist.form);
 }
