@@ -1,0 +1,30 @@
+Télécharger des playlists Spotify en qualité FLAC.
+
+Programme qui créé une Pipeline de manière à exploiter intelligemment
+le processeur selon son nombre de coeurs accessibles et 
+accélerer le processus d'évolution.
+
+De plus, si le processus se voit arrêté avant sa fin, une sauvegarde de
+sa forme actuelle sera sauvegardé et le processus pourra redémarrer
+là où il s'était arrêté.
+
+Avantage 1 : Pouvoir facilement coder un système visant à faire évoluer une entité
+Avantage 2 : On peut arrêter un processus avant sa fin pour le reprendre plus tard
+Avantage 3 : On utilise une pipeline qui exploite au maximum le processeur
+Avantage 4 : Possibilité de parallèliser les processus avec plusieurs machines sans conflit
+
+Système visant à faire évoluer une entité, des données prenant diverses formes intermédiaires
+connues à l'avance.
+
+Programme qui créé une Pipeline de manière à exploiter intelligemment
+le processeur selon son nombre de coeurs accessibles et 
+accélerer le processus d'évolution.
+
+De plus, si le processus se voit arrêté avant sa fin, une sauvegarde de
+sa forme actuelle sera sauvegardé et le processus pourra redémarrer
+là où il s'était arrêté.
+
+Faire en sorte que le code soit facile à écrire et facilement extensible / modifiable.
+
+
+Coder une pipeline générique et intelligente pour évolution d'entités.

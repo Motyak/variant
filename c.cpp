@@ -2,6 +2,9 @@
 #include <variant>
 #include <vector>
 
+template<class... Ts> struct overload : Ts... { using Ts::operator()...; };
+template<class... Ts> overload(Ts...) -> overload<Ts...>;
+
 struct Playlist
 {
     struct Form { Playlist* playlist; };
@@ -42,55 +45,40 @@ void afficher(const Playlist::Json& json)
     std::cout<<json.content<<std::endl;
 }
 
-class PlaylistProcessor
-{
-  public:
-    virtual void operator()(Playlist::InputParams& params) = 0;
-    virtual void operator()(Playlist::HttpReq& params) = 0;
-    virtual void operator()(Playlist::Json& params) = 0;
+const auto processor = overload {
+    [](Playlist::InputParams& params){ params.playlist->form = {Playlist::HttpReq{params.playlist, Playlist::HttpReq::Type::GET, "url", "data"}}; },
+    [](Playlist::HttpReq& req){ req.playlist->form = {Playlist::Json{req.playlist, "content"}}; },
+    [](Playlist::Json& json){}
 };
 
-class Processes : public PlaylistProcessor
-{
-  public:
-    void operator()(Playlist::InputParams& params) override
-    {
-        std::cout<<"InputParams:"<<std::endl;
-        afficher(std::get<Playlist::InputParams>(params.playlist->form));
-        params.playlist->form = {Playlist::HttpReq{params.playlist, Playlist::HttpReq::Type::GET, "url", "data"}};
-    }
-
-    void operator()(Playlist::HttpReq& req) override
-    {
-        std::cout<<"HttpReq:"<<std::endl;
-        afficher(std::get<Playlist::HttpReq>(req.playlist->form));
-        req.playlist->form = {Playlist::Json{req.playlist, "content"}};
-    }
-
-    void operator()(Playlist::Json& json) override
-    {
-        std::cout<<"Json:"<<std::endl;
-        afficher(std::get<Playlist::Json>(json.playlist->form));
-    }
-};
-
-PlaylistProcessor* processor = new Processes{};
 // Playlist creation with its initial form
 Playlist playlist = {{&playlist, 1000, Playlist::InputParams::Quality::GOOD}};
 
 // supposed to be a method, OOP
 void evolve()
 {
-    std::visit(*processor, playlist.form);
+    std::visit(processor, playlist.form);
 }
 
 int main()
 {
-    evolve();
-    evolve();
+    try{ afficher(std::get<Playlist::Json>(playlist.form)); }
+    catch(std::exception e){ std::cout<<"y'a rien"<<std::endl; }
+
     evolve();
 
-    delete(processor);
+    try{ afficher(std::get<Playlist::Json>(playlist.form)); }
+    catch(std::exception e){ std::cout<<"y'a rien"<<std::endl; }
+
+    evolve();
+
+    try{ afficher(std::get<Playlist::Json>(playlist.form)); }
+    catch(std::exception e){ std::cout<<"y'a rien"<<std::endl; }
+
+    evolve();
+
+    try{ afficher(std::get<Playlist::Json>(playlist.form)); }
+    catch(std::exception e){ std::cout<<"y'a rien"<<std::endl; }
 
     // // Playlist creation with its initial form
     // Playlist playlist = {{&playlist, 1000, Playlist::InputParams::Quality::GOOD}};
