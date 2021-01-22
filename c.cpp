@@ -74,17 +74,33 @@ class Processes : public PlaylistProcessor
     }
 };
 
+PlaylistProcessor* processor = new Processes{};
+// Playlist creation with its initial form
+Playlist playlist = {{&playlist, 1000, Playlist::InputParams::Quality::GOOD}};
+
+// supposed to be a method, OOP
+void evolve()
+{
+    std::visit(*processor, playlist.form);
+}
+
 int main()
 {
-    // Playlist creation with its initial form
-    Playlist playlist = {{&playlist, 1000, Playlist::InputParams::Quality::GOOD}};
+    evolve();
+    evolve();
+    evolve();
 
-    // print playlist form and process from InputParams to HttpReq
-    std::visit(Processes{}, playlist.form);
+    delete(processor);
 
-    // print playlist form and process from HttpReq to Json
-    std::visit(Processes{}, playlist.form);
+    // // Playlist creation with its initial form
+    // Playlist playlist = {{&playlist, 1000, Playlist::InputParams::Quality::GOOD}};
 
-    // print playlist form
-    std::visit(Processes{}, playlist.form);
+    // // print playlist form and process from InputParams to HttpReq
+    // std::visit(Processes{}, playlist.form);
+
+    // // print playlist form and process from HttpReq to Json
+    // std::visit(Processes{}, playlist.form);
+
+    // // print playlist form
+    // std::visit(Processes{}, playlist.form);
 }
