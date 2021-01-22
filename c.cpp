@@ -2,6 +2,9 @@
 #include <variant>
 #include <vector>
 
+template<class... Ts> struct overload : Ts... { using Ts::operator()...; };
+template<class... Ts> overload(Ts...) -> overload<Ts...>;
+
 struct Playlist
 {
     struct InputParams
@@ -29,45 +32,46 @@ struct Playlist
 
     std::variant<InputParams,HttpReq,Json> form;
 
-    Playlist(InputParams initialForm) : form(initialForm){}
+    Playlist(std::variant<InputParams,HttpReq,Json> initialForm) : form(initialForm){}
 };
 
-/* UTILITIES */
-void afficher(const Playlist::InputParams& params)
+using PlaylistForm = std::variant<Playlist::InputParams,Playlist::HttpReq,Playlist::Json>;
+
+/* UTILITY */
+void print(const PlaylistForm& form)
 {
-    std::cout<<params.playlistId<<";"<<params.quality<<std::endl<<std::endl;
-}
-void afficher(const Playlist::HttpReq& req)
-{
-    std::cout<<(int)req.type<<";"<<req.url<<";"<<req.data<<std::endl<<std::endl;
-}
-void afficher(const Playlist::Json& json)
-{
-    std::cout<<json.content<<std::endl;
+    std::visit(
+        overload {
+            [](const Playlist::InputParams& params) { std::cout<<params.playlistId<<";"<<params.quality<<std::endl<<std::endl; },
+            [](const Playlist::HttpReq& req) { std::cout<<(int)req.type<<";"<<req.url<<";"<<req.data<<std::endl<<std::endl; },
+            [](const Playlist::Json& json) { std::cout<<json.content<<std::endl; }
+        },
+        form
+    );
 }
 
-struct Processes
+void evolve(PlaylistForm& form)
 {
-    void operator()(Playlist::InputParams& params)
-    {
-        std::cout<<"InputParams:"<<std::endl;
-        afficher(std::get<Playlist::InputParams>(params.playlist->form));
-        params.playlist->form = {Playlist::HttpReq{Playlist::HttpReq::Type::GET, "url", "data", params.playlist}};
-    }
-
-    void operator()(Playlist::HttpReq& req)
-    {
-        std::cout<<"HttpReq:"<<std::endl;
-        afficher(std::get<Playlist::HttpReq>(req.playlist->form));
-        req.playlist->form = {Playlist::Json{"content", req.playlist}};
-    }
-
-    void operator()(Playlist::Json& json)
-    {
-        std::cout<<"Json:"<<std::endl;
-        afficher(std::get<Playlist::Json>(json.playlist->form));
-    }
-};
+    std::visit(
+        overload {
+            [](Playlist::InputParams& params) {
+                std::cout<<"InputParams:"<<std::endl;
+                print(params.playlist->form);
+                params.playlist->form = {Playlist::HttpReq{Playlist::HttpReq::Type::GET, "url", "data", params.playlist}};
+            },
+            [](Playlist::HttpReq& req) {
+                std::cout<<"HttpReq:"<<std::endl;
+                print(req.playlist->form);
+                req.playlist->form = {Playlist::Json{"content", req.playlist}};
+            },
+            [](Playlist::Json& json) {
+                std::cout<<"Json:"<<std::endl;
+                print(json.playlist->form);
+            }
+        },
+        form
+    );
+}
 
 int main()
 {
@@ -75,11 +79,11 @@ int main()
     Playlist playlist({Playlist::InputParams{1000, Playlist::InputParams::Quality::GOOD, &playlist}});
 
     // print playlist form and process from InputParams to HttpReq
-    std::visit(Processes{}, playlist.form);
+    evolve(playlist.form);
 
     // print playlist form and process from HttpReq to Json
-    std::visit(Processes{}, playlist.form);
+    evolve(playlist.form);
 
     // print playlist form
-    std::visit(Processes{}, playlist.form);
+    evolve(playlist.form);
 }
