@@ -27,4 +27,21 @@ là où il s'était arrêté.
 Faire en sorte que le code soit facile à écrire et facilement extensible / modifiable.
 
 
-Coder une pipeline générique et intelligente pour évolution d'entités.
+=> Coder une pipeline générique et intelligente pour évolution d'entités.
+(Aucun interet d'utiliser un variant à priori ?)
+
+__________________
+
+Pipeline trop compliqué et inutile => dans notre cas si on utilise les variants
+alors tous les threads feront le même traitement (evolve d'un param de type variant<..>).
+
+Du coup soit on fait un ThreadPool (pour ne pas perdre de temps à la création de nouveaux threads)
+soit une alternative.
+
+Mais dans notre cas on veut avoir autant de threads que de coeurs cpu accessibles et
+chaque thread fera le même traitement.
+Tous les threads piochent dans la stack commune (la sécuriser avec des lock ou un truc
+du genre).
+
+Le process c'est faire évoluer l'objet jusqu'à ce qu'il atteigne sa forme finale puis
+l'ajouter à la file résultats.
