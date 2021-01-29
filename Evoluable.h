@@ -14,6 +14,7 @@ using Forme = std::variant<int,float,std::string>;
 struct Evoluable
 {
     virtual void evolve() = 0;
+    virtual void afficher() = 0;
     virtual ~Evoluable() = default;
 };
 
@@ -23,5 +24,6 @@ struct Objet : public Evoluable
 
     Objet(Forme formeInitiale);
     void evolve() override;
+    void afficher() override;
 };
 #endif

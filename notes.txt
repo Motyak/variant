@@ -45,3 +45,40 @@ du genre).
 
 Le process c'est faire évoluer l'objet jusqu'à ce qu'il atteigne sa forme finale puis
 l'ajouter à la file résultats.
+
+_____________________________________________
+
+Commencer à coder le thread pool et à réfléchir à comment
+utiliser les files, les jobs de thread, etc..
+(appel de la méthode evolve, condition de sortie?)
+
+Je veux pas vérifier la moindre condition dans mon code
+(pas de boucle et pas de if/switch)
+On pourrait simplement dire qu'une fois qu'un objet est évolué, 
+on le remet dans la file (à la fin donc) et on prend le premier
+et etc..
+
+Faire en sorte que lorsque le thread pool est interrompu ça remet
+les objets en traitement en haut de la file (dequeue) et ça sauvegarde
+tous les éléments de la file dans des fichiers binaires nommées
+selon l'index dans la file (0, 1, 2, ...). Appeler la méthode de l'objet
+evoluable pour faire la sauvegarde (prend en paramètre le nom du fichier).
+
+Au lancement du thread pool, ça charge les objets interrompus dans 
+les fichiers.
+
+Pouvoir mettre des Evoluable de modèles différents dans la file de la
+thread pool.
+Playlist, sous sa forme finale, va ajouté un ensemble de Musique à 
+la file de traitement.
+
+On veut pouvoir mettre le type de données qu'on veut
+(par ex. : un non-variant comme un variant).
+
+L'évolution peut conserver le même type tout du long
+s'il n'est pas nécessaire de le modifier.
+
+Donc en fait on ferait une classe avec un param template
+pour le type des données à faire évoluer, mais
+elle implémente quand même l'interface Evoluable
+(méthodes evolve et pour la persi).
