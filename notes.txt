@@ -82,3 +82,18 @@ Donc en fait on ferait une classe avec un param template
 pour le type des données à faire évoluer, mais
 elle implémente quand même l'interface Evoluable
 (méthodes evolve et pour la persi).
+
+On va exploiter les variant en sauvegardant les entités
+de type variant.
+Du coup leur sauvegarde/restauration est très simple 
+et le processus est le même quelque soit la forme
+de l'entité.
+C'est l'évolueur qui se chargera de sauvegarder l'ensemble
+des entités en cours de traitement, donc on stocke dans un
+fichier un ensemble de variant (ou autre type).
+
+Je veux pouvoir spécialiser la classe Evoluable pour un
+type donné (paramètre template), en l'ocurrence un variant.
+Donc en gros on aura qu'une seule classe (GOOD parce qu'on veut le moins
+de classe possible, sinon évidemment c'est mieux une modélisation plus
+'design-patternée').
