@@ -20,10 +20,12 @@ struct Evoluable
 
     virtual void evolve() = 0;
 
-    friend std::ostream& operator<<(std::ostream& out, Evoluable& e) { return e.extract(out); }
+    friend std::ostream& operator<<(std::ostream& out, Evoluable& e) { return e.insert(out); }
+    friend std::istream& operator>>(std::istream& in, Evoluable& e) { return e.extract(in); }
 
   private:
-    virtual std::ostream& extract(std::ostream& out) = 0;
+    virtual std::ostream& insert(std::ostream& out) { out.write((char*)&this->forme, sizeof(this->forme)); }
+    virtual std::istream& extract(std::istream& in) { in.read((char*)&this->forme, sizeof(this->forme)); }
 };
 
 template<typename T>
@@ -55,15 +57,6 @@ struct Entite<Forme> : public Evoluable<Forme>
                 // this->afficher(); //debug
                 std::cout<<"evolution terminée"<<std::endl;
             }
-        }, this->forme);
-    }
-
-    std::ostream& extract(std::ostream& out)
-    {
-        return std::visit(overload {
-            [&](const int& d) -> std::ostream& { return out << d; },
-            [&](const float& f) -> std::ostream& { return out << f; },
-            [&](const std::string& str) -> std::ostream& { return out << str; }
         }, this->forme);
     }
 };

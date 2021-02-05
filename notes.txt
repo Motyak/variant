@@ -98,3 +98,7 @@ une modélisation plus 'design-patternée' si on veut du gros code.
 A chaque fin de fonction on check si un signal d'interruption a
 été envoyé, au quel cas on sauvegarde les entités en cours de traitement
 puis on ferme l'appli.
+
+Faire en sorte que des implémentations par défaut soit disponibles
+pour l'insertion et extraction d'un evoluable (virtual mais pas pur)
+qui fonctionne du coup en binaire.
