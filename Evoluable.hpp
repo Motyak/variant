@@ -17,8 +17,13 @@ struct Evoluable
     T forme;
 
     Evoluable(T formeInitiale) : forme(formeInitiale){}
+
     virtual void evolve() = 0;
-    virtual void afficher() = 0;
+
+    friend std::ostream& operator<<(std::ostream& out, Evoluable& e) { return e.extract(out); }
+
+  private:
+    virtual std::ostream& extract(std::ostream& out) = 0;
 };
 
 template<typename T>
@@ -36,29 +41,29 @@ struct Entite<Forme> : public Evoluable<Forme>
             [this](const int& d) {
                 std::this_thread::sleep_for(std::chrono::seconds(1));
                 forme = {91.2f};
-                this->afficher(); //debug
+                // this->afficher(); //debug
                 this->evolve();
             },
             [this](const float& f) {
                 std::this_thread::sleep_for(std::chrono::seconds(2));
                 forme = {"quatre-vingt onze"};
-                this->afficher(); //debug
+                // this->afficher(); //debug
                 this->evolve();
             },
             // [](std::string& str) { 
             [this](const std::string& str) {  //debug
-                this->afficher(); //debug
+                // this->afficher(); //debug
                 std::cout<<"evolution terminée"<<std::endl;
             }
         }, this->forme);
     }
 
-    void afficher()
+    std::ostream& extract(std::ostream& out)
     {
-        std::visit(overload {
-            [](const int& d) { std::cout<<d<<std::endl; },
-            [](const float& f) { std::cout<<f<<std::endl; },
-            [](const std::string& str) { std::cout<<str<<std::endl; }
+        return std::visit(overload {
+            [&](const int& d) -> std::ostream& { return out << d; },
+            [&](const float& f) -> std::ostream& { return out << f; },
+            [&](const std::string& str) -> std::ostream& { return out << str; }
         }, this->forme);
     }
 };
