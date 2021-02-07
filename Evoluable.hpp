@@ -20,12 +20,12 @@ struct Evoluable
 
     virtual void evolve() = 0;
 
-    friend std::ostream& operator<<(std::ostream& out, Evoluable& e) { return e.insert(out); }
-    friend std::istream& operator>>(std::istream& in, Evoluable& e) { return e.extract(in); }
+    friend std::ostream& operator<<(std::ostream& out, Evoluable& e) { e.insert(out); }
+    friend std::istream& operator>>(std::istream& in, Evoluable& e) { e.extract(in); }
 
   private:
-    virtual std::ostream& insert(std::ostream& out) { out.write((char*)&this->forme, sizeof(this->forme)); }
-    virtual std::istream& extract(std::istream& in) { in.read((char*)&this->forme, sizeof(this->forme)); }
+    virtual void insert(std::ostream& out) { out.write((char*)&this->forme, sizeof(this->forme)); }
+    virtual void extract(std::istream& in) { in.read((char*)&this->forme, sizeof(this->forme)); }
 };
 
 template<typename T>

@@ -54,9 +54,6 @@ utiliser les files, les jobs de thread, etc..
 
 Je veux pas vérifier la moindre condition dans mon code
 (pas de boucle et pas de if/switch)
-On pourrait simplement dire qu'une fois qu'un objet est évolué, 
-on le remet dans la file (à la fin donc) et on prend le premier
-et etc..
 
 Faire en sorte que lorsque le thread pool est interrompu ça remet
 les objets en traitement en haut de la file (dequeue) et ça sauvegarde
