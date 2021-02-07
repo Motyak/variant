@@ -4,6 +4,7 @@
         "thread": "cpp",
         "iostream": "cpp",
         "chrono": "cpp",
-        "iosfwd": "cpp"
+        "iosfwd": "cpp",
+        "istream": "cpp"
     }
 }
