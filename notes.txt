@@ -92,11 +92,31 @@ fichier un ensemble de variant (ou autre type).
 On veut le moins de classes possible, sinon évidemment c'est mieux 
 une modélisation plus 'design-patternée' si on veut du gros code.
 
-A chaque fin de fonction on check si un signal d'interruption a
-été envoyé, au quel cas on sauvegarde les entités en cours de traitement
-puis on ferme l'appli.
-
 Faire en sorte que des implémentations par défaut soit disponibles
 pour l'insertion et extraction d'un evoluable (virtual mais pas pur)
 qui fonctionne du coup en binaire (fichiers plus volumineux car stocke
 tout l'objet mais plus pratique pour variant).
+
+
+On pourrait simplement sauvegarder automatiquement à la fin d'une évolution
+comme ça pas besoin d'attendre un signal pour faire la sauvegarde ?
+'
+ -> NON, car l'Evoluable n'effectue pas de sauvegarde de lui-même,
+ il n'est que passif => il peut en revanche être sauvegardé (on définit
+ comment insérer/extraire). DONC, on fait l'histoire du signal ou autres..?
+ '
+  -> DONC en réalité OUI MAIS la sauvegarde automatique sera à faire côté Evolueur
+  et non pas depuis l'Evoluable en lui-même.
+
+_______________________________________________________________________
+
+ATTAQUER L'EVOLUEUR
+
+-> Faire un fichier Evolueur.hpp comprenant la définition des classes Evoluable et Evolueur.
+-> Faire un fichier Entite.hpp comprenant la définition de la classe Entite héritant de Evoluable.
+
+  Le but de l'Evolueur c'est qu'il puisse à lui-seul faire évoluer n'importe quel type
+  d'Evoluable (quelque soit le param de template). Le développeur, pour utiliser mon Evolueur,
+  ne doit avoir qu'à spécializer son propre type d'Evoluable (définir son évolution).
+
+
