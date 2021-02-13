@@ -6,6 +6,7 @@
         "chrono": "cpp",
         "iosfwd": "cpp",
         "istream": "cpp",
-        "ios": "cpp"
+        "ios": "cpp",
+        "mutex": "cpp"
     }
 }
