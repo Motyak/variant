@@ -128,3 +128,17 @@ entités une à une, on veut pouvoir commencer à travailler rapidement.
 
 
 => FAIRE LE MEME TEST EN ECRIVANT/LISANT DES STRING A LA PLACE DES VARIANTS
+=>
+--------------
+C'est le fait de faire la lecture de
+Forme dans un thread qui pose pb 
+(même si y'a qu'un thread).
+
+Ca marche très bien avec les strings
+meme avec 8 threads (sauf qu'il faut
+quand meme mutex btw on verra)
+
+Ca marche très bien lorsqu'on fait
+la lecture de Forme depuis la fonction
+main (sans thread)
+--------------
