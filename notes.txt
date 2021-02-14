@@ -120,3 +120,11 @@ ATTAQUER L'EVOLUEUR
   ne doit avoir qu'à spécializer son propre type d'Evoluable (définir son évolution).
 
 
+Un fichier 'processing' pour les entités qui n'ont pas fini leur évolution et 
+un fichier 'completed' pour les autres. On pioche dedans comme dans une stack
+(on partage l'index et on accède via le curseur en lecture seule).
+L'idée c'est de ne pas avoir à charger un fichier entier sachant qu'on traite les
+entités une à une, on veut pouvoir commencer à travailler rapidement.
+
+
+=> FAIRE LE MEME TEST EN ECRIVANT/LISANT DES STRING A LA PLACE DES VARIANTS
