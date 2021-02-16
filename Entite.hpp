@@ -5,12 +5,12 @@
 
 #include <thread>
 #include <chrono>
-#include <variant>
+// #include <variant>
 
-template<class... Ts> struct overload : Ts... { using Ts::operator()...; };
-template<class... Ts> overload(Ts...) -> overload<Ts...>;
+// template<class... Ts> struct overload : Ts... { using Ts::operator()...; };
+// template<class... Ts> overload(Ts...) -> overload<Ts...>;
 
-using Forme = std::variant<int,float,std::string>;
+// using Forme = std::variant<int,float,std::string>;
 
 template<typename T>
 struct Entite : public Evoluable<T>{};

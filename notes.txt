@@ -126,19 +126,22 @@ un fichier 'completed' pour les autres. On pioche dedans comme dans une stack
 L'idée c'est de ne pas avoir à charger un fichier entier sachant qu'on traite les
 entités une à une, on veut pouvoir commencer à travailler rapidement.
 
+--------------------------------------------
 
-=> FAIRE LE MEME TEST EN ECRIVANT/LISANT DES STRING A LA PLACE DES VARIANTS
-=>
---------------
-C'est le fait de faire la lecture de
-Forme dans un thread qui pose pb 
-(même si y'a qu'un thread).
+LA QUESTION CEST : comment stocker l'intégralité de l'information d'un variant?
+Je ne pense pas qu'on puisse faire une implémentation par défaut de l'insertion/extraction.
 
-Ca marche très bien avec les strings
-meme avec 8 threads (sauf qu'il faut
-quand meme mutex btw on verra)
+Il faut dire que Evoluable peut prend plusieurs param templates, et qu'il
+hérite de std::variant.
 
-Ca marche très bien lorsqu'on fait
-la lecture de Forme depuis la fonction
-main (sans thread)
---------------
+
+
+
+
+Il faudrait un truc mieux que mutex
+=> en l'occurence, il faudrait que le premier
+thread a détecté une fin de fichier le signale aux
+autres threads de telle sorte qu'ils n'essaient plus
+d'extraire des éléments du fichier.
+
+MAIS pour l'instant on va se contenter du mutex.
