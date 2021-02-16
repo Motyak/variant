@@ -1,38 +1,43 @@
-#include "Evolueur.hpp"
+#include "Entite.hpp"
 
 #include <fstream>
 
 #define FILENAME "test"
 
-using Ev = Evoluable<int,float,std::string>;
+using Ent = Entite<int,float,std::string>;
 
 //debug
-void afficher(const Ev& ev)
+void afficher(const Ent& ent)
 {
     std::visit(overload {
         [](const int& d) { std::cout<<d<<std::endl; },
         [](const float& f) { std::cout<<f<<std::endl; },
         [](const std::string& str) { std::cout<<str<<std::endl; },
         [](auto onsaitpas){ std::cout<<"onsaitpas"<<std::endl; }
-    }, ev.forme);
+    }, ent.forme);
 }
 
 // g++ main.cpp -std=c++17 -pthread
 int main()
 {
-    std::cout<<"ECRITURE"<<std::endl;
+    /* ECRITURE */
     {
         std::ofstream os(FILENAME, std::ofstream::binary | std::ofstream::trunc);
-        os << Ev{91} << Ev{13.37f} << Ev{"unechaineunechaineunechaineunechaineunechaineunechaine"};
+        os << Ent{91} << Ent{13.37f} << Ent{"abc"};
     }
 
-    std::cout<<std::endl<<"LECTURE"<<std::endl;
+    /* LECTURE */
     {
         std::ifstream is(FILENAME, std::ifstream::binary);
-        Ev ev{0};
-        is >> ev; afficher(ev);
-        is >> ev; afficher(ev);
-        is >> ev; afficher(ev);
+        Ent ent{0};
+        is >> ent; afficher(ent);
+        is >> ent; afficher(ent);
+        is >> ent; afficher(ent);
+    }
+
+    /* EVOLUTION */
+    {
+        Ent{123}.evolve();
     }
     
 }

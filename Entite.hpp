@@ -5,20 +5,16 @@
 
 #include <thread>
 #include <chrono>
-// #include <variant>
-
-// template<class... Ts> struct overload : Ts... { using Ts::operator()...; };
-// template<class... Ts> overload(Ts...) -> overload<Ts...>;
 
 // using Forme = std::variant<int,float,std::string>;
 
-template<typename T>
-struct Entite : public Evoluable<T>{};
+template<typename... Types>
+struct Entite : public Evoluable<Types...>{};
 
 template<>
-struct Entite<Forme> : public Evoluable<Forme>
+struct Entite<int,float,std::string> : public Evoluable<int,float,std::string>
 {
-    Entite(Forme formeInitiale) : Evoluable(formeInitiale){}
+    Entite(std::variant<int,float,std::string> formeInitiale) : Evoluable(formeInitiale){}
 
     void evolve()
     {
