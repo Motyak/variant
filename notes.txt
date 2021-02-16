@@ -132,7 +132,7 @@ LA QUESTION CEST : comment stocker l'intégralité de l'information d'un variant
 Je ne pense pas qu'on puisse faire une implémentation par défaut de l'insertion/extraction.
 
 Il faut dire que Evoluable peut prend plusieurs param templates, et qu'il
-hérite de std::variant.
+wrap/hérite d'un std::variant.
 
 
 
