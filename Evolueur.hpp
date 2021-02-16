@@ -16,25 +16,28 @@ struct Evoluable
 
 //     virtual void evolve() = 0;
 
-    friend std::ostream& operator<<(std::ostream& out, const Evoluable& e) 
+    friend std::ostream& operator<<(std::ostream& out, const Evoluable& e)
     {
-        return std::visit(overload {
-            [&](const std::string& str) -> std::ostream& {
-                std::size_t s = sizeof(char) * str.length();
-                out.write((char*)&s, sizeof(std::size_t));
-                return out << str;
-            },
-            [&](auto other) -> std::ostream& {
-                e.insert(out);
-                return out;
-            }
-        }, e.forme);
+        e.insert(out);
+        return out;
+
+        // return std::visit(overload {
+            // [&](const std::string& str) -> std::ostream& {
+            //     std::size_t s = sizeof(char) * str.length();
+            //     out.write((char*)&s, sizeof(std::size_t));
+            //     return out << str;
+            // },
+        //     [&](auto other) -> std::ostream& {
+        //         e.insert(out);
+        //         return out;
+        //     }
+        // }, e.forme);
     }
-    // friend std::istream& operator>>(std::istream& in, Evoluable& e)
-    // {
-    //     e.extract(in);
-    //     return in;
-    // }
+    friend std::istream& operator>>(std::istream& in, Evoluable& e)
+    {
+        e.extract(in);
+        return in;
+    }
 
   private:
     virtual void insert(std::ostream& out) const
@@ -53,13 +56,13 @@ struct Evoluable
 
         out.write((char*)&this->forme, s);
     }
-//     virtual void extract(std::istream& in)
-//     {
-//         std::size_t s;
-//         in.read((char*)&s, sizeof(std::size_t));
-//         std::cout<<"size of next elem : "<<s<<std::endl;
-//         in.read((char*)&this->forme, s);
-//     }
+    virtual void extract(std::istream& in)
+    {
+        std::size_t s;
+        in.read((char*)&s, sizeof(std::size_t));
+        std::cout<<"size of next elem : "<<s<<std::endl;
+        in.read((char*)&this->forme, s);
+    }
 };
 
 #endif
