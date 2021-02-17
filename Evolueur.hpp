@@ -28,5 +28,6 @@ struct Evoluable
         void serialize(Archive& ar) { ar(donnees); }
     };
 };
+CEREAL_REGISTER_TYPE(Evoluable);
 
 #endif

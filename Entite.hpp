@@ -37,10 +37,34 @@ struct Entite : public Evoluable, Evoluable::Forme<int,float,std::string>
         }, this->donnees);
     }
 };
-
-CEREAL_REGISTER_TYPE(Evoluable);
-// CEREAL_REGISTER_TYPE(Evoluable::Forme<int,float,std::string>);
 CEREAL_REGISTER_TYPE(Entite);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(Evoluable, Entite);
+
+struct Entite2 : public Evoluable, Evoluable::Forme<double,char>
+{
+    Entite2() = default;
+    Entite2(const std::variant<double,char>& formeInitiale) : Evoluable::Forme<double,char>(formeInitiale){}
+
+    template<class Archive>
+    void serialize(Archive& ar) { ar(cereal::base_class<Evoluable::Forme<double,char>>(this)); }
+
+    void evolve()
+    {
+        std::cout<<"evolution..."<<std::endl;
+        std::visit(overload {
+            [this](const double& dou) {
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                donnees = {(char)((int)dou)};
+                this->evolve();
+            },
+            [this](const char& c) {
+                std::this_thread::sleep_for(std::chrono::seconds(2));
+                std::cout<<"évolution terminée : "<<std::get<char>(donnees)<<std::endl;
+            }
+        }, this->donnees);
+    }
+};
+CEREAL_REGISTER_TYPE(Entite2);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(Evoluable, Entite2);
 
 #endif
