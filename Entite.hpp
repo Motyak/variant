@@ -7,17 +7,16 @@
 #include <chrono>
 
 template<typename... Types>
-struct Entite : public Evoluable<Types...>
-{
-    template<class Archive>
-    void serialize(Archive& ar) { ar(cereal::base_class<Evoluable<Types...>>(this)); }
-};
+struct Entite : public Evoluable<Types...>{};
 
 template<>
 struct Entite<int,float,std::string> : public Evoluable<int,float,std::string>
 {
     Entite() : Evoluable(){}//
-    Entite(std::variant<int,float,std::string> formeInitiale) : Evoluable(formeInitiale){}
+    Entite(const std::variant<int,float,std::string>& formeInitiale) : Evoluable(formeInitiale){}
+
+    template<class Archive>
+    void serialize(Archive& ar) { ar(cereal::base_class<Evoluable<int,float,std::string>>(this)); }
 
     void evolve()
     {
