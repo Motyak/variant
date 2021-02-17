@@ -6,14 +6,17 @@
 #include <thread>
 #include <chrono>
 
-// using Forme = std::variant<int,float,std::string>;
-
 template<typename... Types>
-struct Entite : public Evoluable<Types...>{};
+struct Entite : public Evoluable<Types...>
+{
+    template<class Archive>
+    void serialize(Archive& ar) { ar(cereal::base_class<Evoluable<Types...>>(this)); }
+};
 
 template<>
 struct Entite<int,float,std::string> : public Evoluable<int,float,std::string>
 {
+    Entite() : Evoluable(){}//
     Entite(std::variant<int,float,std::string> formeInitiale) : Evoluable(formeInitiale){}
 
     void evolve()
@@ -37,5 +40,8 @@ struct Entite<int,float,std::string> : public Evoluable<int,float,std::string>
         }, this->forme);
     }
 };
+
+CEREAL_REGISTER_TYPE(Evoluable<int,float,std::string>);
+CEREAL_REGISTER_TYPE(Entite<int,float,std::string>);
 
 #endif

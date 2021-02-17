@@ -134,7 +134,14 @@ Je ne pense pas qu'on puisse faire une implémentation par défaut de l'insertio
 Il faut dire que Evoluable peut prend plusieurs param templates, et qu'il
 wrap/hérite d'un std::variant.
 
+Pour pas se faire chier il faudrait simplement fixer une taille fixe et être capable
+de sauvegarder l'entièreté de l'information d'un variant.
 
+BON le prochain truc à test c'est de faire des variants avec QUE des types à taille
+réelle fixe.
+
+OU ALORS on utilise une librairie sophistiquée genre cereal parce que ça supporte
+les std::variant notamment.
 
 
 

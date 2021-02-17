@@ -1,6 +1,7 @@
 #include "Entite.hpp"
 
 #include <fstream>
+#include <memory>
 
 #define FILENAME "test"
 
@@ -22,22 +23,24 @@ int main()
 {
     /* ECRITURE */
     {
-        std::ofstream os(FILENAME, std::ofstream::binary | std::ofstream::trunc);
-        os << Ent{91} << Ent{13.37f} << Ent{"abc"};
+        // std::ofstream os(FILENAME, std::ofstream::binary | std::ofstream::trunc);
+        // cereal::BinaryOutputArchive oarchive(os);
+        // std::shared_ptr<Evoluable<int,float,std::string>> ev = std::make_shared<Entite<int,float,std::string>>({91});
+        // oarchive(ev);
     }
 
     /* LECTURE */
     {
-        std::ifstream is(FILENAME, std::ifstream::binary);
-        Ent ent{0};
-        is >> ent; afficher(ent);
-        is >> ent; afficher(ent);
-        is >> ent; afficher(ent);
+        // std::ifstream is(FILENAME, std::ifstream::binary);
+        // cereal::BinaryInputArchive iarchive(is);
+        // Ent ent{0};
+        // iarchive(ent);
+        // afficher(ent);
     }
 
     /* EVOLUTION */
-    {
-        Ent{123}.evolve();
-    }
+    // {
+    //     Ent{123}.evolve();
+    // }
     
 }

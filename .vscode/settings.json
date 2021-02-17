@@ -9,6 +9,7 @@
         "ios": "cpp",
         "mutex": "cpp",
         "xstring": "cpp",
-        "xiosbase": "cpp"
+        "xiosbase": "cpp",
+        "fstream": "cpp"
     }
 }
