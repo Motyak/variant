@@ -22,19 +22,18 @@ struct Entite : public Evoluable, Evoluable::Forme<int,float,std::string>
         std::visit(overload {
             [this](const int& d) {
                 std::this_thread::sleep_for(std::chrono::seconds(1));
-                donnees = {d + 100.f};
+                *this = {d + 100.f};
                 this->evolve();
             },
             [this](const float& f) {
                 std::this_thread::sleep_for(std::chrono::seconds(2));
-                donnees = {"str" + std::to_string(f)};
+                *this = {"str" + std::to_string(f)};
                 this->evolve();
             },
-            // [](std::string& str) { 
-            [this](std::string& str) { //debug
-                std::cout<<"evolution terminée : "<<std::get<std::string>(donnees)<<std::endl;
+            [this](std::string& str) {
+                std::cout<<"evolution terminée : "<<std::get<std::string>(forme)<<std::endl;
             }
-        }, this->donnees);
+        }, this->forme);
     }
 };
 CEREAL_REGISTER_TYPE(Entite);
@@ -54,14 +53,14 @@ struct Entite2 : public Evoluable, Evoluable::Forme<double,char>
         std::visit(overload {
             [this](const double& dou) {
                 std::this_thread::sleep_for(std::chrono::seconds(1));
-                donnees = {(char)((int)dou)};
+                *this = {(char)((int)dou)};
                 this->evolve();
             },
             [this](const char& c) {
                 std::this_thread::sleep_for(std::chrono::seconds(2));
-                std::cout<<"évolution terminée : "<<std::get<char>(donnees)<<std::endl;
+                std::cout<<"évolution terminée : "<<std::get<char>(forme)<<std::endl;
             }
-        }, this->donnees);
+        }, this->forme);
     }
 };
 CEREAL_REGISTER_TYPE(Entite2);

@@ -19,13 +19,13 @@ struct Evoluable
     template<typename... Types>
     struct Forme
     {
-        std::variant<Types...> donnees;
+        std::variant<Types...> forme;
 
         Forme() = default;
-        Forme(const std::variant<Types...>& formeInitiale) : donnees(formeInitiale){}
+        Forme(const std::variant<Types...>& formeInitiale) : forme(formeInitiale){}
 
         template<class Archive>
-        void serialize(Archive& ar) { ar(donnees); }
+        void serialize(Archive& ar) { ar(forme); }
     };
 };
 CEREAL_REGISTER_TYPE(Evoluable);
