@@ -9,8 +9,8 @@
 #include <thread>
 #include <mutex>
 
-template<class... Ts> struct overload : Ts... { using Ts::operator()...; };
-template<class... Ts> overload(Ts...) -> overload<Ts...>;
+template<class... Ts> struct Evolution : Ts... { using Ts::operator()...; };
+template<class... Ts> Evolution(Ts...) -> Evolution<Ts...>;
 
 struct Evoluable
 {

@@ -19,7 +19,7 @@ struct Entite : public Evoluable, Evoluable::Forme<int,float,std::string>
     void evolve()
     {
         std::cout<<"evolution..."<<std::endl;
-        std::visit(overload {
+        std::visit(Evolution {
             [this](const int& d) {
                 std::this_thread::sleep_for(std::chrono::seconds(1));
                 *this = {d + 100.f};
@@ -50,7 +50,7 @@ struct Entite2 : public Evoluable, Evoluable::Forme<double,char>
     void evolve()
     {
         std::cout<<"evolution..."<<std::endl;
-        std::visit(overload {
+        std::visit(Evolution {
             [this](const double& dou) {
                 std::this_thread::sleep_for(std::chrono::seconds(1));
                 *this = {(char)((int)dou)};
