@@ -1,12 +1,31 @@
 #include "Entite.hpp"
 
 #include <fstream>
+#include <thread>
+#include <mutex>
 
 #define FILENAME "test"
 
-/* debug */
-void afficher(const Entite&);
-void afficher(const Entite2&);
+void doIt(std::istream& is, std::mutex& mut)
+{
+    EvoluablePtr ev;
+
+    while(true)
+    {
+        /* extraction du prochain élément */
+        mut.lock();
+        if(is.peek() == std::ifstream::traits_type::eof())
+        {
+            mut.unlock();
+            return; // ou 'continue' si on veut que ça continue de tourner
+        }
+        is >> ev;
+        mut.unlock();
+
+        /* operation sur l'element */
+        ev->evolve();
+    }
+}
 
 // g++ main.cpp -std=c++17 -pthread
 int main()
@@ -15,53 +34,27 @@ int main()
     {
         std::ofstream os(FILENAME, std::ofstream::binary | std::ofstream::trunc);
         for(const auto& e : std::vector<EvoluablePtr>{
-            std::make_shared<Entite>(13.37f),
-            std::make_shared<Entite>("abcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabc"),
-            std::make_shared<Entite2>(91.0),
-            std::make_shared<Entite2>('x')
+            std::make_shared<Entite>(91), std::make_shared<Entite>(13.37f),
+            std::make_shared<Entite>("unechaine,unechaine,unechaine"),
+            std::make_shared<Entite>(10), std::make_shared<Entite>(10.37f),
+            std::make_shared<Entite>("unechaine10,unechaine10,unechaine10"),
+            std::make_shared<Entite2>(84.0), std::make_shared<Entite2>('a'),
+            std::make_shared<Entite2>(79.0), std::make_shared<Entite2>('b'),
+            std::make_shared<Entite2>(77.0), std::make_shared<Entite2>('c'),
         })
             os << e;
     }
 
-    /* LECTURE */
-    {
-        std::ifstream is(FILENAME, std::ifstream::binary);
-        std::vector<EvoluablePtr> ev {
-            std::make_shared<Entite>(),  std::make_shared<Entite>(),
-            std::make_shared<Entite2>(), std::make_shared<Entite2>()
-        };
-        for(auto& e : ev)
-            is >> e;
-
-        /* debug */
-        for(int i = 0 ; i < 2 ; ++i)
-            afficher(*std::static_pointer_cast<Entite>(ev[i]).get());
-        for(int i = 2 ; i < 4 ; ++i)
-            afficher(*std::static_pointer_cast<Entite2>(ev[i]).get());
-    }
-
     /* EVOLUTION */
     {
-        Entite{123}.evolve();
-        Entite2{65.1}.evolve();
-    } 
-}
+        const unsigned POOL_SIZE = std::thread::hardware_concurrency();
+        std::ifstream is(FILENAME, std::ifstream::binary);
+        std::mutex mut;
+        std::vector<std::thread> pool;
+        for(int i = 0; i < POOL_SIZE; ++i)
+            pool.push_back(std::thread(doIt, std::ref(is), std::ref(mut)));
 
-/* debug */
-void afficher(const Entite& ent)
-{
-    std::visit(overload {
-        [](const int& d) { std::cout<<d<<std::endl; },
-        [](const float& f) { std::cout<<f<<std::endl; },
-        [](const std::string& str) { std::cout<<str<<std::endl; },
-        [](auto onsaitpas){ std::cout<<"onsaitpas"<<std::endl; }
-    }, ent.forme);
-}
-void afficher(const Entite2& ent)
-{
-    std::visit(overload {
-        [](const double& dou) { std::cout<<dou<<std::endl; },
-        [](const char& c) { std::cout<<c<<std::endl; },
-        [](auto onsaitpas){ std::cout<<"onsaitpas"<<std::endl; }
-    }, ent.forme);
+        for(auto& t : pool)
+            t.join();
+    }
 }
