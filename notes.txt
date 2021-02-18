@@ -130,9 +130,10 @@ entités une à une, on veut pouvoir commencer à travailler rapidement.
 
 Prochaine étape : 
 
-Il faudrait écrire une fonction friend qui surcharge les opérateurs
-d'insertion/extraction sur un std::shared_pointer<Evoluable> pour
-que ça utilise les archives de cereal en fond.
+Il faut pouvoir passer une fonction en argument de la méthode
+evolve qui va être appelé après chaque transformation. 
+En l'occurence nous on va passer une lambda fonction qui
+va écrire dans un slot réservé l'entité.
 
 
 

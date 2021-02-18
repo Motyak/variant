@@ -1,38 +1,14 @@
 #include "Entite.hpp"
 
-#include <fstream>
-#include <thread>
-#include <mutex>
-
-#define FILENAME "test"
-
-void doIt(std::istream& is, std::mutex& mut)
+// g++ main.cpp -o evolueur -std=c++17 -pthread
+int main(int argc, char* argv[])
 {
-    EvoluablePtr ev;
+    const std::string INPUT_FILENAME = argv[1];
+    const std::string OUTPUT_FILENAME = argv[2];
 
-    while(true)
-    {
-        /* extraction du prochain élément */
-        mut.lock();
-        if(is.peek() == std::ifstream::traits_type::eof())
-        {
-            mut.unlock();
-            return; // ou 'continue' si on veut que ça continue de tourner
-        }
-        is >> ev;
-        mut.unlock();
-
-        /* operation sur l'element */
-        ev->evolve();
-    }
-}
-
-// g++ main.cpp -std=c++17 -pthread
-int main()
-{
     /* ECRITURE */
     {
-        std::ofstream os(FILENAME, std::ofstream::binary | std::ofstream::trunc);
+        std::ofstream os(INPUT_FILENAME, std::ofstream::binary | std::ofstream::trunc);
         for(const auto& e : std::vector<EvoluablePtr>{
             std::make_shared<Entite>(91), std::make_shared<Entite>(13.37f),
             std::make_shared<Entite>("unechaine,unechaine,unechaine"),
@@ -47,14 +23,7 @@ int main()
 
     /* EVOLUTION */
     {
-        const unsigned POOL_SIZE = std::thread::hardware_concurrency();
-        std::ifstream is(FILENAME, std::ifstream::binary);
-        std::mutex mut;
-        std::vector<std::thread> pool;
-        for(int i = 0; i < POOL_SIZE; ++i)
-            pool.push_back(std::thread(doIt, std::ref(is), std::ref(mut)));
-
-        for(auto& t : pool)
-            t.join();
+        Evolueur e;
+        e(INPUT_FILENAME, OUTPUT_FILENAME);
     }
 }

@@ -5,12 +5,12 @@
 #include "cereal/archives/binary.hpp"
 #include "cereal/types/variant.hpp"
 
-#include <iostream>
-#include <variant>
+#include <fstream>
+#include <thread>
+#include <mutex>
 
 template<class... Ts> struct overload : Ts... { using Ts::operator()...; };
 template<class... Ts> overload(Ts...) -> overload<Ts...>;
-
 
 struct Evoluable
 {
@@ -45,5 +45,48 @@ std::istream& operator>>(std::istream& is, EvoluablePtr& ev)
     iarchive(ev);
     return is;
 }
+
+class Evolueur
+{
+    void callbackFn(std::istream& is, std::ostream& os, std::mutex& read, std::mutex& write)
+    {
+        EvoluablePtr ev;
+        while(true)
+        {
+            /* extraction du prochain élément */
+            read.lock();
+            if(is.peek() == std::ifstream::traits_type::eof())
+            {
+                read.unlock();
+                return; // ou 'continue' si on veut que ça continue de tourner
+            }
+            is >> ev;
+            read.unlock();
+
+            /* operation sur l'element */
+            ev->evolve();
+
+            /* insertion de l'element sous sa forme finale */
+            write.lock();
+            os << ev;
+            write.unlock();
+        }
+    }
+
+  public:
+    void operator()(const std::string& inputFilename, const std::string& outputFilename)
+    {
+        const int POOL_SIZE = std::thread::hardware_concurrency();
+        std::ifstream is(inputFilename, std::ifstream::binary);
+        std::ofstream os(outputFilename, std::ofstream::binary | std::ofstream::trunc);
+        std::mutex read, write;
+        std::vector<std::thread> pool;
+        for(int i = 0; i < POOL_SIZE; ++i)
+            pool.push_back(std::thread(&Evolueur::callbackFn, this, std::ref(is), std::ref(os), std::ref(read), std::ref(write)));
+
+        for(auto& t : pool)
+            t.join();
+    }
+};
 
 #endif
