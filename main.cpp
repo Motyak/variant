@@ -1,11 +1,53 @@
 #include "Entite.hpp"
 
 #include <fstream>
-#include <memory>
 
 #define FILENAME "test"
 
-//debug
+/* debug */
+void afficher(const Entite&);
+void afficher(const Entite2&);
+
+// g++ main.cpp -std=c++17 -pthread
+int main()
+{
+    /* ECRITURE */
+    {
+        std::ofstream os(FILENAME, std::ofstream::binary | std::ofstream::trunc);
+        for(const auto& e : std::vector<EvoluablePtr>{
+            std::make_shared<Entite>(13.37f),
+            std::make_shared<Entite>("abcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabc"),
+            std::make_shared<Entite2>(91.0),
+            std::make_shared<Entite2>('x')
+        })
+            os << e;
+    }
+
+    /* LECTURE */
+    {
+        std::ifstream is(FILENAME, std::ifstream::binary);
+        std::vector<EvoluablePtr> ev {
+            std::make_shared<Entite>(),  std::make_shared<Entite>(),
+            std::make_shared<Entite2>(), std::make_shared<Entite2>()
+        };
+        for(auto& e : ev)
+            is >> e;
+
+        /* debug */
+        for(int i = 0 ; i < 2 ; ++i)
+            afficher(*std::static_pointer_cast<Entite>(ev[i]).get());
+        for(int i = 2 ; i < 4 ; ++i)
+            afficher(*std::static_pointer_cast<Entite2>(ev[i]).get());
+    }
+
+    /* EVOLUTION */
+    {
+        Entite{123}.evolve();
+        Entite2{65.1}.evolve();
+    } 
+}
+
+/* debug */
 void afficher(const Entite& ent)
 {
     std::visit(overload {
@@ -15,8 +57,6 @@ void afficher(const Entite& ent)
         [](auto onsaitpas){ std::cout<<"onsaitpas"<<std::endl; }
     }, ent.forme);
 }
-
-//debug
 void afficher(const Entite2& ent)
 {
     std::visit(overload {
@@ -24,41 +64,4 @@ void afficher(const Entite2& ent)
         [](const char& c) { std::cout<<c<<std::endl; },
         [](auto onsaitpas){ std::cout<<"onsaitpas"<<std::endl; }
     }, ent.forme);
-}
-
-// g++ main.cpp -std=c++17 -pthread
-int main()
-{
-    /* ECRITURE */
-    {
-        std::ofstream os(FILENAME, std::ofstream::binary | std::ofstream::trunc);
-        cereal::BinaryOutputArchive oarchive(os);
-        std::shared_ptr<Evoluable> ev1 = std::make_shared<Entite>(13.37f);
-        std::shared_ptr<Evoluable> ev2 = std::make_shared<Entite>("abcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabc");
-        std::shared_ptr<Evoluable> ev3 = std::make_shared<Entite2>(91.0);
-        std::shared_ptr<Evoluable> ev4 = std::make_shared<Entite2>('x');
-        oarchive(ev1, ev2, ev3, ev4);
-    }
-
-    /* LECTURE */
-    {
-        std::ifstream is(FILENAME, std::ifstream::binary);
-        cereal::BinaryInputArchive iarchive(is);
-        std::shared_ptr<Evoluable> ev1 = std::make_shared<Entite>(0);
-        std::shared_ptr<Evoluable> ev2 = std::make_shared<Entite>(0);
-        std::shared_ptr<Evoluable> ev3 = std::make_shared<Entite2>(0.0);
-        std::shared_ptr<Evoluable> ev4 = std::make_shared<Entite2>(0.0);
-        iarchive(ev1, ev2, ev3, ev4);
-        afficher(*std::static_pointer_cast<Entite>(ev1).get());
-        afficher(*std::static_pointer_cast<Entite>(ev2).get());
-        afficher(*std::static_pointer_cast<Entite2>(ev3).get());
-        afficher(*std::static_pointer_cast<Entite2>(ev4).get());
-    }
-
-    /* EVOLUTION */
-    {
-        Entite{123}.evolve();
-        Entite2{65.1}.evolve();
-    }
-    
 }

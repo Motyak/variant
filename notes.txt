@@ -128,20 +128,11 @@ entités une à une, on veut pouvoir commencer à travailler rapidement.
 
 --------------------------------------------
 
-LA QUESTION CEST : comment stocker l'intégralité de l'information d'un variant?
-Je ne pense pas qu'on puisse faire une implémentation par défaut de l'insertion/extraction.
+Prochaine étape : 
 
-Il faut dire que Evoluable peut prend plusieurs param templates, et qu'il
-wrap/hérite d'un std::variant.
-
-Pour pas se faire chier il faudrait simplement fixer une taille fixe et être capable
-de sauvegarder l'entièreté de l'information d'un variant.
-
-BON le prochain truc à test c'est de faire des variants avec QUE des types à taille
-réelle fixe.
-
-OU ALORS on utilise une librairie sophistiquée genre cereal parce que ça supporte
-les std::variant notamment.
+Il faudrait écrire une fonction friend qui surcharge les opérateurs
+d'insertion/extraction sur un std::shared_pointer<Evoluable> pour
+que ça utilise les archives de cereal en fond.
 
 
 

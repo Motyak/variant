@@ -30,4 +30,20 @@ struct Evoluable
 };
 CEREAL_REGISTER_TYPE(Evoluable);
 
+using EvoluablePtr = std::shared_ptr<Evoluable>;
+
+std::ostream& operator<<(std::ostream& os, const EvoluablePtr& ev)
+{
+    cereal::BinaryOutputArchive oarchive(os);
+    oarchive(ev);
+    return os;
+}
+
+std::istream& operator>>(std::istream& is, EvoluablePtr& ev)
+{
+    cereal::BinaryInputArchive iarchive(is);
+    iarchive(ev);
+    return is;
+}
+
 #endif
