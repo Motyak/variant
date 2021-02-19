@@ -8,13 +8,14 @@
 #include <fstream>
 #include <thread>
 #include <mutex>
+#include <functional>
 
 template<class... Ts> struct Evolution : Ts... { using Ts::operator()...; };
 template<class... Ts> Evolution(Ts...) -> Evolution<Ts...>;
 
 struct Evoluable
 {
-    virtual void evolve() = 0;
+    virtual void evolve(const std::function<void (std::ostream&,std::mutex&)>& pre_trans, std::ostream& os, std::mutex& write) = 0;
 
     template<typename... Types>
     struct Forme
@@ -64,12 +65,12 @@ class Evolueur
             read.unlock();
 
             /* operation sur l'element */
-            ev->evolve();
-
-            /* insertion de l'element sous sa forme finale */
-            write.lock();
-            os << ev;
-            write.unlock();
+            ev->evolve([&](std::ostream& os, std::mutex& write){
+                /* sauvegarde de la forme actuelle */
+                write.lock();
+                os << ev;
+                write.unlock();
+            }, os, write);
         }
     }
 

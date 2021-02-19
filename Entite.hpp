@@ -16,21 +16,22 @@ struct Entite : public Evoluable, Evoluable::Forme<int,float,std::string>
     template<class Archive>
     void serialize(Archive& ar) { ar(cereal::base_class<Evoluable::Forme<int,float,std::string>>(this)); }
 
-    void evolve()
+    void evolve(const std::function<void (std::ostream&,std::mutex&)>& pre_trans, std::ostream& os, std::mutex& write)
     {
         std::cout<<"evolution..."<<std::endl;
+        pre_trans(os, write);
         std::visit(Evolution {
-            [this](const int& d) {
+            [&](const int& d) {
                 std::this_thread::sleep_for(std::chrono::seconds(1));
                 *this = {d + 100.f};
-                this->evolve();
+                evolve(pre_trans, os, write);
             },
-            [this](const float& f) {
+            [&](const float& f) {
                 std::this_thread::sleep_for(std::chrono::seconds(2));
                 *this = {"str" + std::to_string(f)};
-                this->evolve();
+                evolve(pre_trans, os, write);
             },
-            [this](std::string& str) {
+            [&](std::string& str) {
                 std::cout<<"evolution terminée : "<<std::get<std::string>(forme)<<std::endl;
             }
         }, this->forme);
@@ -47,16 +48,17 @@ struct Entite2 : public Evoluable, Evoluable::Forme<double,char>
     template<class Archive>
     void serialize(Archive& ar) { ar(cereal::base_class<Evoluable::Forme<double,char>>(this)); }
 
-    void evolve()
+    void evolve(const std::function<void (std::ostream&,std::mutex&)>& pre_trans, std::ostream& os, std::mutex& write)
     {
         std::cout<<"evolution..."<<std::endl;
+        pre_trans(os, write);
         std::visit(Evolution {
-            [this](const double& dou) {
+            [&](const double& dou) {
                 std::this_thread::sleep_for(std::chrono::seconds(1));
                 *this = {(char)((int)dou)};
-                this->evolve();
+                evolve(pre_trans, os, write);
             },
-            [this](const char& c) {
+            [&](const char& c) {
                 std::this_thread::sleep_for(std::chrono::seconds(2));
                 std::cout<<"évolution terminée : "<<std::get<char>(forme)<<std::endl;
             }

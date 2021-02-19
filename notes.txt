@@ -130,17 +130,12 @@ entités une à une, on veut pouvoir commencer à travailler rapidement.
 
 Prochaine étape : 
 
-Il faut pouvoir passer une fonction en argument de la méthode
-evolve qui va être appelé après chaque transformation. 
-En l'occurence nous on va passer une lambda fonction qui
-va écrire dans un slot réservé l'entité.
+Dans la callback function de l'évolueur, 
+il faut qu'on puisse passer à la méthode evolve()
+une lambda function avec ses paramètres pour l'executer
+avant chaque transformation (en l'occurence l'écriture
+de l'entité dans le fichier output dans son slot réservé)
 
-
-
-Il faudrait un truc mieux que mutex
-=> en l'occurence, il faudrait que le premier
-thread a détecté une fin de fichier le signale aux
-autres threads de telle sorte qu'ils n'essaient plus
-d'extraire des éléments du fichier.
-
-MAIS pour l'instant on va se contenter du mutex.
+Avoir à la place du mutex un wrapper de mutex avec en plus
+un slot réservé dans le fichier (position dans le fichier output
+où écrire les différentes formes pre-transformation)
