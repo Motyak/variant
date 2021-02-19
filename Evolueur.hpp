@@ -15,7 +15,7 @@ template<class... Ts> Evolution(Ts...) -> Evolution<Ts...>;
 
 struct Evoluable
 {
-    virtual void evolve(const std::function<void (std::ostream&,std::mutex&)>& pre_trans, std::ostream& os, std::mutex& write) = 0;
+    virtual bool evoluer() = 0;
 
     template<typename... Types>
     struct Forme
@@ -65,12 +65,18 @@ class Evolueur
             read.unlock();
 
             /* operation sur l'element */
-            ev->evolve([&](std::ostream& os, std::mutex& write){
+            do 
+            {
                 /* sauvegarde de la forme actuelle */
                 write.lock();
                 os << ev;
                 write.unlock();
-            }, os, write);
+            } while(ev->evoluer());
+
+            /* sauvegarde de la forme finale */
+            write.lock();
+            os << ev;
+            write.unlock();
         }
     }
 

@@ -16,23 +16,23 @@ struct Entite : public Evoluable, Evoluable::Forme<int,float,std::string>
     template<class Archive>
     void serialize(Archive& ar) { ar(cereal::base_class<Evoluable::Forme<int,float,std::string>>(this)); }
 
-    void evolve(const std::function<void (std::ostream&,std::mutex&)>& pre_trans, std::ostream& os, std::mutex& write)
+    bool evoluer()
     {
         std::cout<<"evolution..."<<std::endl;
-        pre_trans(os, write);
-        std::visit(Evolution {
-            [&](const int& d) {
+        return std::visit(Evolution {
+            [&](const int& d) -> bool {
                 std::this_thread::sleep_for(std::chrono::seconds(1));
                 *this = {d + 100.f};
-                evolve(pre_trans, os, write);
+                return true;
             },
-            [&](const float& f) {
+            [&](const float& f) -> bool {
                 std::this_thread::sleep_for(std::chrono::seconds(2));
                 *this = {"str" + std::to_string(f)};
-                evolve(pre_trans, os, write);
+                return true;
             },
-            [&](std::string& str) {
+            [&](std::string& str) -> bool {
                 std::cout<<"evolution terminée : "<<std::get<std::string>(forme)<<std::endl;
+                return false;
             }
         }, this->forme);
     }
@@ -48,19 +48,19 @@ struct Entite2 : public Evoluable, Evoluable::Forme<double,char>
     template<class Archive>
     void serialize(Archive& ar) { ar(cereal::base_class<Evoluable::Forme<double,char>>(this)); }
 
-    void evolve(const std::function<void (std::ostream&,std::mutex&)>& pre_trans, std::ostream& os, std::mutex& write)
+    bool evoluer()
     {
         std::cout<<"evolution..."<<std::endl;
-        pre_trans(os, write);
-        std::visit(Evolution {
-            [&](const double& dou) {
+        return std::visit(Evolution {
+            [&](const double& dou) -> bool {
                 std::this_thread::sleep_for(std::chrono::seconds(1));
                 *this = {(char)((int)dou)};
-                evolve(pre_trans, os, write);
+                return true;
             },
-            [&](const char& c) {
+            [&](const char& c) -> bool {
                 std::this_thread::sleep_for(std::chrono::seconds(2));
                 std::cout<<"évolution terminée : "<<std::get<char>(forme)<<std::endl;
+                return false;
             }
         }, this->forme);
     }

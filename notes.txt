@@ -130,12 +130,8 @@ entités une à une, on veut pouvoir commencer à travailler rapidement.
 
 Prochaine étape : 
 
-Dans la callback function de l'évolueur, 
-il faut qu'on puisse passer à la méthode evolve()
-une lambda function avec ses paramètres pour l'executer
-avant chaque transformation (en l'occurence l'écriture
-de l'entité dans le fichier output dans son slot réservé)
-
+Faire en sorte de sauvegarder les formes intermédiaires d'une même entité dans
+un même slot (on écrase les anciennes formes).
 Avoir à la place du mutex un wrapper de mutex avec en plus
 un slot réservé dans le fichier (position dans le fichier output
 où écrire les différentes formes pre-transformation)
