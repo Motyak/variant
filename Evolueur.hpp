@@ -59,37 +59,36 @@ class Evolueur
     const std::string host, port;
     std::mutex mut;
 
-    void callbackFn(const int& i)
+    void callbackFn(const int& dbId)
     {
         auto redis = sw::redis::Redis("tcp://" + this->host + ":" + this->port);
         EvoluablePtr ev;
 
         while(true)
         {
+            /* récupération d'une entité */
             std::unordered_set<std::string> keys;
-
-            /* extraction du prochain élément */
             redis.command("SELECT", "0");
             this->mut.lock();
-            redis.scan(0, 1, std::inserter(keys, keys.begin()));
+            redis.scan(0, 2, std::inserter(keys, keys.begin()));
             if(keys.empty())
             {
                 this->mut.unlock();
                 return;
             }
-            std::istringstream iss(*redis.get(*keys.begin()));
+            std::istringstream iss(*keys.begin());
             redis.command("DEL", *keys.begin());
             this->mut.unlock();
             iss >> ev;
 
-            /* operation sur l'element */
-            redis.command("SELECT", std::to_string(i));
+            /* évolution de l'entité */
+            redis.command("SELECT", std::to_string(dbId));
             do 
             {
                 /* sauvegarde de la forme actuelle */
+                redis.command("FLUSHDB");
                 redis << ev;
             } while(ev->evoluer());
-            redis.command("DEL", *keys.begin());
 
             /* sauvegarde de la forme finale */
             redis.command("SELECT", "1");
@@ -103,10 +102,9 @@ class Evolueur
     void operator()()
     {
         const int POOL_SIZE = std::thread::hardware_concurrency();
-        std::mutex mut;
         std::vector<std::thread> pool;
         for(int i = 0; i < POOL_SIZE; ++i)
-            pool.push_back(std::thread(&Evolueur::callbackFn, this, 10 + i));
+            pool.push_back(std::thread(&Evolueur::callbackFn, this, 2 + i));
 
         for(auto& t : pool)
             t.join();

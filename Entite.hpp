@@ -58,7 +58,6 @@ struct Entite2 : public Evoluable, Evoluable::Forme<double,char>
                 return true;
             },
             [&](const char& c) -> bool {
-                std::this_thread::sleep_for(std::chrono::seconds(2));
                 std::cout<<"évolution terminée : "<<std::get<char>(forme)<<std::endl;
                 return false;
             }
