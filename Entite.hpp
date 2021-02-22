@@ -1,7 +1,7 @@
 #ifndef ENTITE_H
 #define ENTITE_H
 
-#include "Evolueur.hpp"
+#include "Evoluable.hpp"
 
 #include "cereal/types/string.hpp"
 

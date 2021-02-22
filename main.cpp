@@ -1,4 +1,5 @@
 #include "Entite.hpp"
+#include "Evolueur.hpp"
 
 #include <csignal>
 

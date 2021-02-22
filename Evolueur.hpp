@@ -1,51 +1,13 @@
 #ifndef EVOLUEUR_H
 #define EVOLUEUR_H
 
+#include "Evoluable.hpp"
+
 #include <sw/redis++/redis++.h>
-#include "cereal/types/polymorphic.hpp"
-#include "cereal/archives/binary.hpp"
-#include "cereal/types/variant.hpp"
 
 #include <sstream>
 #include <thread>
 #include <mutex>
-
-template<class... Ts> struct Evolution : Ts... { using Ts::operator()...; };
-template<class... Ts> Evolution(Ts...) -> Evolution<Ts...>;
-
-struct Evoluable
-{
-    virtual bool evoluer() = 0;
-
-    template<typename... Types>
-    struct Forme
-    {
-        std::variant<Types...> forme;
-
-        Forme() = default;
-        Forme(const std::variant<Types...>& formeInitiale) : forme(formeInitiale){}
-
-        template<class Archive>
-        void serialize(Archive& ar) { ar(forme); }
-    };
-};
-CEREAL_REGISTER_TYPE(Evoluable);
-
-using EvoluablePtr = std::shared_ptr<Evoluable>;
-
-std::ostream& operator<<(std::ostream& os, const EvoluablePtr& ev)
-{
-    cereal::BinaryOutputArchive oarchive(os);
-    oarchive(ev);
-    return os;
-}
-
-std::istream& operator>>(std::istream& is, EvoluablePtr& ev)
-{
-    cereal::BinaryInputArchive iarchive(is);
-    iarchive(ev);
-    return is;
-}
 
 void operator<<(sw::redis::Redis& redis, const EvoluablePtr& ev)
 {
@@ -126,27 +88,6 @@ class Evolueur
 
         exit(signum);
     }
-
-    // auto getSigintHandler() -> void(*)(int)
-    // {
-    //     // retourner le handler basé sur le host et port en attributs
-    //     return [&](int signum) {
-    //         std::cout<<"sigint"<<std::endl;
-
-    //         /* Copie des évoluables non complétés dans les inputs */
-    //         auto redis = sw::redis::Redis("tcp://" + this->host + ":" + this->port);
-    //         for(int i = 2 ; i <= 5 ; ++i)
-    //         {
-    //             redis.command("SELECT", std::to_string(i));
-    //             auto key = sw::redis::reply::parse<sw::redis::OptionalString>(*redis.command("RANDOMKEY"));
-    //             if(!key)
-    //                 continue;
-    //             redis.command("MOVE", key, "0");
-    //         }
-
-    //         exit(signum);
-    //     };
-    // }
 };
 
 #endif
