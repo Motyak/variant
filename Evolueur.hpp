@@ -56,29 +56,27 @@ void operator<<(sw::redis::Redis& redis, const EvoluablePtr& ev)
 
 class Evolueur
 {
-    const std::string host, port;
     std::mutex mut;
 
     void callbackFn(const int& dbId)
     {
-        auto redis = sw::redis::Redis("tcp://" + this->host + ":" + this->port);
+        auto redis = sw::redis::Redis("tcp://" + Evolueur::HOST + ":" + Evolueur::PORT);
         EvoluablePtr ev;
 
         while(true)
         {
             /* récupération d'une entité */
-            std::unordered_set<std::string> keys;
             redis.command("SELECT", "0");
             this->mut.lock();
-            redis.scan(0, 2, std::inserter(keys, keys.begin()));
-            if(keys.empty())
+            auto key = sw::redis::reply::parse<sw::redis::OptionalString>(*redis.command("RANDOMKEY"));
+            if(!key)
             {
                 this->mut.unlock();
                 return;
             }
-            std::istringstream iss(*keys.begin());
-            redis.command("DEL", *keys.begin());
+            redis.command("DEL", *key);
             this->mut.unlock();
+            std::istringstream iss(*key);
             iss >> ev;
 
             /* évolution de l'entité */
@@ -97,8 +95,9 @@ class Evolueur
     }
 
   public:
-    Evolueur(const std::string& host = "127.0.0.1", const std::string& port = "6379") : host(host), port(port){}
-    
+    inline static const std::string HOST = "127.0.0.1";
+    inline static const std::string PORT = "6379";
+
     void operator()()
     {
         const int POOL_SIZE = std::thread::hardware_concurrency();
@@ -109,6 +108,45 @@ class Evolueur
         for(auto& t : pool)
             t.join();
     }
+
+    static void sigintHandler(int signum)
+    {
+        std::cout<<"sigint"<<std::endl;
+
+        /* Copie des évoluables non complétés dans les inputs */
+        auto redis = sw::redis::Redis("tcp://" + Evolueur::HOST + ":" + Evolueur::PORT);
+        for(int i = 2 ; i <= 5 ; ++i)
+        {
+            redis.command("SELECT", std::to_string(i));
+            auto key = sw::redis::reply::parse<sw::redis::OptionalString>(*redis.command("RANDOMKEY"));
+            if(!key)
+                continue;
+            redis.command("MOVE", *key, "0");
+        }
+
+        exit(signum);
+    }
+
+    // auto getSigintHandler() -> void(*)(int)
+    // {
+    //     // retourner le handler basé sur le host et port en attributs
+    //     return [&](int signum) {
+    //         std::cout<<"sigint"<<std::endl;
+
+    //         /* Copie des évoluables non complétés dans les inputs */
+    //         auto redis = sw::redis::Redis("tcp://" + this->host + ":" + this->port);
+    //         for(int i = 2 ; i <= 5 ; ++i)
+    //         {
+    //             redis.command("SELECT", std::to_string(i));
+    //             auto key = sw::redis::reply::parse<sw::redis::OptionalString>(*redis.command("RANDOMKEY"));
+    //             if(!key)
+    //                 continue;
+    //             redis.command("MOVE", key, "0");
+    //         }
+
+    //         exit(signum);
+    //     };
+    // }
 };
 
 #endif

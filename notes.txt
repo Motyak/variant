@@ -129,6 +129,9 @@ entités une à une, on veut pouvoir commencer à travailler rapidement.
 --------------------------------------------
 
 Il n'y a qu'un seul serveur Redis accessible par les différentes machines de calcul.
+'-> A l'heure actuelle pas possible car on utilise des mutex et que les transactions
+    Redis ne sont pas thread safe donc inutile de les envisager pour ce cas d'utilisation.
+
 La base 0 est réservé aux inputs (lecture+suppression mutexé et écriture des
 entités non terminées).
 La base 17 est réservé à l'écriture des outputs (entités en forme finale).
@@ -141,3 +144,19 @@ base 0 (inputs) pour qu'elles puissent être traitées par une autre machine.
 En vrai y'a besoin de hash que les inputs (formes initiales de la base 0) donc
 ça pourrait être intéressant de mettre en clé le hash de la valeur et en valeur
 la forme au format binaire.
+
+
+Prochaine étape : 
+Lorsque le programme est quitté, faire en sorte qu'au lieu de flush la db on déplace
+l'entité vers la base 0 (inputs).
+On va faire une méthode statique qu'on appellera lorsqu'on catchera dans le main
+un SIGINT ou SIGTERM.
+
+redis :
+randomkey pour retourner une clé aléatoire de la base actuelle.
+move pour déplacer une clé de la base actuelle vers une base destination.
+
+PB : Je suis obligé de hardcodé l'host et le port dans Evolueur car
+la fonction signal de linux/POSIX prend en deuxième argument un pointeur
+vers fonction void(*)(int) sauf qu'on peut pas retourner une lambda qui capture
+et donc on peut pas accèder aux membres de la classe Evolueur (host et port).

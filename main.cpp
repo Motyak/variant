@@ -1,14 +1,13 @@
 #include "Entite.hpp"
 
-// g++ -std=c++17 main.cpp -o evolueur -lredis++ -lhiredis -pthread
-int main(int argc, char* argv[])
-{
-    std::string HOST = argv[1];
-    std::string PORT = argv[2];
+#include <csignal>
 
+// g++ -std=c++17 main.cpp -o evolueur -lredis++ -lhiredis -pthread
+int main()
+{
     /* ECRITURE */
     {
-        auto redis = sw::redis::Redis("tcp://" + HOST + ":" + PORT);
+        auto redis = sw::redis::Redis("tcp://" + Evolueur::HOST + ":" + Evolueur::PORT);
         for(const auto& e : std::vector<EvoluablePtr>{
             std::make_shared<Entite>(91), std::make_shared<Entite>(13.37f),
             std::make_shared<Entite>("unechaine,unechaine,unechaine"),
@@ -24,7 +23,8 @@ int main(int argc, char* argv[])
 
     /* EVOLUTION */
     {
-        Evolueur e(HOST, PORT);
+        Evolueur e;
+        signal(SIGINT, Evolueur::sigintHandler);
         e();
     }
 }
