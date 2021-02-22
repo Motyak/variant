@@ -34,7 +34,7 @@ class Evolueur
             if(!key)
             {
                 this->mut.unlock();
-                return;
+                continue;
             }
             redis.command("DEL", *key);
             this->mut.unlock();
@@ -51,6 +51,7 @@ class Evolueur
             } while(ev->evoluer());
 
             /* sauvegarde de la forme finale */
+            redis.command("FLUSHDB");
             redis.command("SELECT", "1");
             redis << ev;
         }
