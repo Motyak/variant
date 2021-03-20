@@ -17,10 +17,11 @@ RUN apk add --no-cache g++ && \
     make && \
     make install && \
     export LD_LIBRARY_PATH=/usr/local/lib && \
-    ldconfig && \
+    ldconfig /etc/ld.so.conf.d && \
     g++ -std=c++17 /src/main.cpp -o /evolueur -pthread -lredis++ -lhiredis && \
     cd / && \
     rm -rf src && \
-    apk del g++ make cmake
+    apk del g++ make cmake && \
+    apk add --no-cache libstdc++
 
 ENTRYPOINT ["./evolueur"]

@@ -1,4 +1,0 @@
-Grace au DNS de docker-compose on peut accèder à un service (sur un conteneur)
-depuis un autre conteneur par l'url qui porte le nom du service.
-Donc au lieu de me connecter au serveur en local par 127.0.0.1, je me connecterai
-à 'redis'.
