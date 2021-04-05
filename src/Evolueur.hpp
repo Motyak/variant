@@ -8,6 +8,8 @@
 #include <sstream>
 #include <thread>
 #include <mutex>
+#include <experimental/filesystem>
+#include <fstream>
 
 void operator<<(sw::redis::Redis& redis, const EvoluablePtr& ev)
 {
@@ -18,10 +20,12 @@ void operator<<(sw::redis::Redis& redis, const EvoluablePtr& ev)
 
 class Evolueur
 {
+    std::experimental::filesystem::path TEMP_DIR;
     std::mutex mut;
 
-    void callbackFn(const int& dbId)
+    void callbackFn(int threadId)
     {
+        const std::string FILENAME = (this->TEMP_DIR / std::to_string(threadId)).string();
         auto redis = sw::redis::Redis("tcp://" + Evolueur::HOST + ":" + Evolueur::PORT);
         EvoluablePtr ev;
 
@@ -42,31 +46,37 @@ class Evolueur
             iss >> ev;
 
             /* évolution de l'entité */
-            redis.command("SELECT", std::to_string(dbId));
             do 
             {
-                /* sauvegarde de la forme actuelle */
-                redis.command("FLUSHDB");
-                redis << ev;
+                /* backup local de la forme intermédiaire */
+                std::ofstream os(FILENAME, std::ofstream::binary | std::ofstream::trunc);
+                os << ev;
             } while(ev->evoluer());
 
             /* sauvegarde de la forme finale */
-            redis.command("FLUSHDB");
             redis.command("SELECT", "1");
             redis << ev;
         }
     }
 
   public:
-    inline static const std::string HOST = "127.0.0.1";
+    // inline static const std::string HOST = "127.0.0.1";
+    inline static const std::string HOST = "192.168.56.109";
     inline static const std::string PORT = "6379";
+
+    Evolueur()
+    {
+        this->TEMP_DIR = std::experimental::filesystem::temp_directory_path()
+                / "evolueur";
+        std::experimental::filesystem::create_directory(this->TEMP_DIR);
+    }
 
     void operator()()
     {
         const int POOL_SIZE = std::thread::hardware_concurrency();
         std::vector<std::thread> pool;
-        for(int i = 0; i < POOL_SIZE; ++i)
-            pool.push_back(std::thread(&Evolueur::callbackFn, this, 2 + i));
+        for(int threadId = 1; threadId <= POOL_SIZE; ++threadId)
+            pool.push_back(std::thread(&Evolueur::callbackFn, this, threadId));
 
         for(auto& t : pool)
             t.join();
@@ -74,18 +84,30 @@ class Evolueur
 
     static void sigintHandler(int signum)
     {
-        std::cout<<"sigint"<<std::endl;
+        const std::experimental::filesystem::path TEMP_DIR = 
+                std::experimental::filesystem::temp_directory_path() 
+                / "evolueur";
+        auto redis = sw::redis::Redis("tcp://" + Evolueur::HOST + ":" + Evolueur::PORT);
 
         /* Copie des évoluables non complétés dans les inputs */
-        auto redis = sw::redis::Redis("tcp://" + Evolueur::HOST + ":" + Evolueur::PORT);
-        for(int i = 2 ; i <= 5 ; ++i)
+        EvoluablePtr ev;
+        const int POOL_SIZE = std::thread::hardware_concurrency();
+        for(int threadId = 1 ; threadId <= POOL_SIZE ; ++threadId)
         {
-            redis.command("SELECT", std::to_string(i));
-            auto key = sw::redis::reply::parse<sw::redis::OptionalString>(*redis.command("RANDOMKEY"));
-            if(!key)
+            const std::experimental::filesystem::path FILE_PATH = 
+                    TEMP_DIR / std::to_string(threadId);
+
+            if(!std::experimental::filesystem::exists(FILE_PATH))
                 continue;
-            redis.command("MOVE", *key, "0");
+            else
+            {
+                std::ifstream is(FILE_PATH.string(), std::ifstream::binary);
+                is >> ev;
+                redis << ev; //base 0 sélectionnée par défaut
+            }
         }
+
+        std::experimental::filesystem::remove_all(TEMP_DIR);
 
         exit(signum);
     }

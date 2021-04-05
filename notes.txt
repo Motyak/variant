@@ -132,13 +132,14 @@ Il n'y a qu'un seul serveur Redis accessible par les différentes machines de ca
 '-> A l'heure actuelle pas possible car on utilise des mutex et que les transactions
     Redis ne sont pas thread safe donc inutile de les envisager pour ce cas d'utilisation.
 
-La base 0 est réservé aux inputs (lecture+suppression mutexé et écriture des
-entités non terminées).
-La base 17 est réservé à l'écriture des outputs (entités en forme finale).
-Les bases 1 à 16 sont utilisées pour l'écriture de données temporaires (backup
-des formes intermédiaires). Thread 1->base 1, Thread 8 -> base 8, ... Thread 16 -> base 16.
+La base 0 est réservée aux inputs (lecture+suppression mutexés et écriture
+  des entités non terminées)
+La base 1 est réservée à l'écriture des outputs (entités en forme finale).
+Les fichiers cache 1 à n sont utilisées pour l'écriture de données temporaires 
+  (backup des formes intermédiaires). Thread 1->fichier '1', 
+  Thread 8 -> fichier '8', ... Thread 16 -> base 16.
 Lorsqu'une machine cesse de travailler, il doit mettre son entité non terminé dans la
-base 0 (inputs) pour qu'elles puissent être traitées par une autre machine.
+  base 0 (inputs) pour qu'elles puissent être traitées par une autre machine.
 
 PB : Je suis obligé de hardcodé l'host et le port dans Evolueur car
 la fonction signal de linux/POSIX prend en deuxième argument un pointeur

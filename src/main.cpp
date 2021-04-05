@@ -3,7 +3,7 @@
 
 #include <csignal>
 
-// g++ -std=c++17 main.cpp -o evolueur -lredis++ -lhiredis -pthread
+// g++ -std=c++17 src/main.cpp -o evolueur -lredis++ -lhiredis -pthread -lstdc++fs
 int main()
 {
     /* ECRITURE */
