@@ -18,7 +18,7 @@ RUN apk add --no-cache g++ && \
     make install && \
     export LD_LIBRARY_PATH=/usr/local/lib && \
     ldconfig /etc/ld.so.conf.d && \
-    g++ -std=c++17 /src/main.cpp -o /evolueur -pthread -lredis++ -lhiredis && \
+    g++ -std=c++17 /src/main.cpp -o /evolueur -lredis++ -lhiredis -lstdc++fs -pthread && \
     cd / && \
     rm -rf src && \
     apk del g++ make cmake && \

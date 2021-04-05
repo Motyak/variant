@@ -56,6 +56,9 @@ class Evolueur
             /* sauvegarde de la forme finale */
             redis.command("SELECT", "1");
             redis << ev;
+
+            /* supprimer fichier temp */
+            std::experimental::filesystem::remove(FILENAME);
         }
     }
 
