@@ -20,6 +20,7 @@ void operator<<(sw::redis::Redis& redis, const EvoluablePtr& ev)
 
 class Evolueur
 {
+    const std::string GET_ENT = "local key = redis.call('RANDOMKEY'); if key then redis.call('DEL', key) end; return key";
     std::experimental::filesystem::path TEMP_DIR;
     std::mutex mut;
 
@@ -34,16 +35,14 @@ class Evolueur
             /* récupération d'une entité */
             redis.command("SELECT", "0");
             this->mut.lock();
-            auto key = sw::redis::reply::parse<sw::redis::OptionalString>(*redis.command("RANDOMKEY"));
+            auto key = redis.eval<sw::redis::OptionalString>(this->GET_ENT, {}, {});
             if(!key)
             {
                 this->mut.unlock();
                 continue;
             }
-            redis.command("DEL", *key);
             this->mut.unlock();
-            std::istringstream iss(*key);
-            iss >> ev;
+            std::istringstream(*key) >> ev;
 
             /* évolution de l'entité */
             do 

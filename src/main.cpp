@@ -17,9 +17,15 @@ int main()
             std::make_shared<Entite2>(84.0), std::make_shared<Entite2>('a'),
             std::make_shared<Entite2>(79.0), std::make_shared<Entite2>('b'),
             std::make_shared<Entite2>(77.0), std::make_shared<Entite2>('c'),
+            std::make_shared<Entite>(910), std::make_shared<Entite>(130.37f),
+            std::make_shared<Entite>("_unechaine,unechaine,unechaine"),
+            std::make_shared<Entite>(100), std::make_shared<Entite>(100.37f),
+            std::make_shared<Entite>("_unechaine10,unechaine10,unechaine10"),
+            std::make_shared<Entite2>(840.0), std::make_shared<Entite2>('A'),
+            std::make_shared<Entite2>(790.0), std::make_shared<Entite2>('B'),
+            std::make_shared<Entite2>(770.0), std::make_shared<Entite2>('C')
         })
-            redis << e;
-            
+            redis << e;       
     }
 
     /* EVOLUTION */
