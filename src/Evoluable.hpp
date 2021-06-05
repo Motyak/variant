@@ -11,6 +11,7 @@ template<class... Ts> Evolution(Ts...) -> Evolution<Ts...>;
 struct Evoluable
 {
     virtual bool evoluer() = 0;
+    virtual void utiliser() = 0;
 
     template<typename... Types>
     struct Forme

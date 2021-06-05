@@ -20,13 +20,18 @@ class Redis
 
     enum Base
     {
-        INPUTS,
+        INPUTS, //par défaut
         OUTPUTS
     };
 
     Redis()
     {
         this->connexion = std::make_unique<sw::redis::Redis>("tcp://" + env::GET_REDIS_HOST() + ":" + env::GET_REDIS_PORT());
+    }
+
+    Redis(std::string host, std::string port)
+    {
+        this->connexion = std::make_unique<sw::redis::Redis>("tcp://" + host + ":" + port);
     }
 
     void changerBase(Base b)

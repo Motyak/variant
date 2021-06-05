@@ -34,13 +34,11 @@ class Evolueur
                 os << *ev;
             } while((*ev)->evoluer());
 
-            /* sauvegarde de la forme finale */
-            redis.changerBase(Redis::Base::OUTPUTS);
-            redis << *ev;
+            // utilisation de l'entité
+            (*ev)->utiliser();
 
-            /* supprime le fichier temp et remet la base par défaut */
+            // suppression du fichier temp
             std::experimental::filesystem::remove(FILENAME);
-            redis.changerBase(Redis::Base::INPUTS);
         }
     }
 

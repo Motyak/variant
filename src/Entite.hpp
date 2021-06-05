@@ -2,6 +2,7 @@
 #define ENTITE_HPP
 
 #include "Evoluable.hpp"
+#include "Redis.hpp"
 
 #include <cereal/types/string.hpp>
 
@@ -36,6 +37,13 @@ struct Entite : public Evoluable, Evoluable::Forme<int,float,std::string>
             }
         }, this->forme);
     }
+
+    void utiliser()
+    {
+        Redis redis;
+        redis.changerBase(Redis::Base::OUTPUTS);
+        redis << std::make_shared<Entite>(*this);
+    }
 };
 CEREAL_REGISTER_TYPE(Entite);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(Evoluable, Entite);
@@ -62,6 +70,13 @@ struct Entite2 : public Evoluable, Evoluable::Forme<double,char>
                 return false;
             }
         }, this->forme);
+    }
+
+    void utiliser()
+    {
+        Redis redis;
+        redis.changerBase(Redis::Base::OUTPUTS);
+        redis << std::make_shared<Entite2>(*this);
     }
 };
 CEREAL_REGISTER_TYPE(Entite2);
