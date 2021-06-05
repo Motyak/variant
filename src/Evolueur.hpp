@@ -5,7 +5,6 @@
 #include "Redis.hpp"
 
 #include <thread>
-#include <mutex>
 #include <experimental/filesystem>
 #include <fstream>
 
@@ -13,8 +12,6 @@ class Evolueur
 {
     inline static const int POOL_SIZE = std::thread::hardware_concurrency(); 
     inline static const std::experimental::filesystem::path TEMP_DIR = std::experimental::filesystem::temp_directory_path() / "evolueur";
-
-    std::mutex mut;
 
     void callbackFn(int threadId)
     {
@@ -25,9 +22,7 @@ class Evolueur
         while(true)
         {
             /* récupération d'une entité */
-            this->mut.lock();
             redis >> ev;
-            this->mut.unlock();
             if(!ev)
                 continue;
 

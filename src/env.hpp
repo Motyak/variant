@@ -17,7 +17,7 @@ namespace env
     {
         char* port = std::getenv("REDIS_PORT");
         if(!port)
-            return "3679";
+            return "6379";
         return std::string(port);
     }
 }

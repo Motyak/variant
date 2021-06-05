@@ -6,8 +6,12 @@
 
 #include <sw/redis++/redis++.h>
 
+#include <mutex>
+
 class Redis
 {
+    inline static std::mutex mut;
+
     const std::string SAFE_GET = "local key = redis.call('RANDOMKEY'); if key then redis.call('DEL', key) end; return key";
 
     std::unique_ptr<sw::redis::Redis> connexion;
@@ -39,7 +43,9 @@ class Redis
 
     std::optional<EvoluablePtr> recuperer()
     {
+        Redis::mut.lock();
         auto key = this->connexion->eval<sw::redis::OptionalString>(this->SAFE_GET, {}, {});
+        Redis::mut.unlock();
         if(!key)
             return {};
         EvoluablePtr ev;
