@@ -1,5 +1,5 @@
-#ifndef ENTITE_H
-#define ENTITE_H
+#ifndef ENTITE_HPP
+#define ENTITE_HPP
 
 #include "Evoluable.hpp"
 

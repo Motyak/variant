@@ -1,5 +1,5 @@
-#ifndef EVOLUABLE_H
-#define EVOLUABLE_H
+#ifndef EVOLUABLE_HPP
+#define EVOLUABLE_HPP
 
 #include <cereal/types/polymorphic.hpp>
 #include <cereal/archives/binary.hpp>
