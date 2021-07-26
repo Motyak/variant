@@ -27,15 +27,16 @@ class Evolueur
                 continue;
 
             /* évolution de l'entité */
-            do 
+            do
             {
                 /* backup local de la forme intermédiaire */
                 std::ofstream os(FILENAME, std::ofstream::binary | std::ofstream::trunc);
                 os << *ev;
             } while((*ev)->evoluer());
 
-            // utilisation de l'entité
-            (*ev)->utiliser();
+            /* push split ou forme finale */
+            auto split = (*ev)->split();
+            redis << (split?*split:Redis::Outputs{*ev});
 
             // suppression du fichier temp
             std::experimental::filesystem::remove(FILENAME);

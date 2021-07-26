@@ -12,7 +12,7 @@ class Redis
 {
     inline static std::mutex mut;
 
-    const std::string SAFE_GET = "local key = redis.call('RANDOMKEY'); if key then redis.call('DEL', key) end; return key";
+    const std::string ATOMIC_POP = "local key = redis.call('RANDOMKEY'); if key then redis.call('DEL', key) end; return key";
 
     std::unique_ptr<sw::redis::Redis> connexion;
 
@@ -22,6 +22,14 @@ class Redis
     {
         INPUTS, //par défaut
         OUTPUTS
+    };
+
+    // on peut insérer Outputs dans Redis pour push dans la base outputs
+    struct Outputs
+    {
+        std::vector<EvoluablePtr> evs;
+        Outputs(EvoluablePtr ev) : evs({ev}){}
+        Outputs(std::vector<EvoluablePtr> evs) : evs(evs){}
     };
 
     Redis()
@@ -49,7 +57,7 @@ class Redis
     std::optional<EvoluablePtr> recuperer()
     {
         Redis::mut.lock();
-        auto key = this->connexion->eval<sw::redis::OptionalString>(this->SAFE_GET, {}, {});
+        auto key = this->connexion->eval<sw::redis::OptionalString>(this->ATOMIC_POP, {}, {});
         Redis::mut.unlock();
         if(!key)
             return {};
@@ -62,6 +70,21 @@ class Redis
 Redis& operator<<(Redis& redis, const EvoluablePtr& ev)
 {
     redis.ajouter(ev);
+    return redis;
+}
+
+Redis& operator<<(Redis& redis, const std::vector<EvoluablePtr>& evs)
+{
+    for(const auto& ev : evs)
+        redis << ev;
+    return redis;
+}
+
+Redis& operator<<(Redis& redis, const Redis::Outputs& out)
+{
+    redis.changerBase(Redis::OUTPUTS);
+    redis << out.evs;
+    redis.changerBase(Redis::INPUTS); // on remet par défaut
     return redis;
 }
 

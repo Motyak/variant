@@ -8,10 +8,13 @@
 template<class... Ts> struct Evolution : Ts... { using Ts::operator()...; };
 template<class... Ts> Evolution(Ts...) -> Evolution<Ts...>;
 
+struct Evoluable;
+using EvoluablePtr = std::shared_ptr<Evoluable>;
+using OptionalEvoluablePtrs = std::optional<std::vector<EvoluablePtr>>;
 struct Evoluable
 {
     virtual bool evoluer() = 0;
-    virtual void utiliser() = 0;
+    virtual OptionalEvoluablePtrs split() { return {}; }
 
     template<typename... Types>
     struct Forme
@@ -26,8 +29,6 @@ struct Evoluable
     };
 };
 CEREAL_REGISTER_TYPE(Evoluable);
-
-using EvoluablePtr = std::shared_ptr<Evoluable>;
 
 std::ostream& operator<<(std::ostream& os, const EvoluablePtr& ev)
 {
