@@ -3,8 +3,7 @@
 
 #include "env.hpp"
 #include "Evoluable.hpp"
-
-#include <sw/redis++/redis++.h>
+#include "_RedisPlusPlusBny.h"
 
 #include <mutex>
 
@@ -14,7 +13,7 @@ class Redis
 
     const std::string ATOMIC_POP = "local key = redis.call('RANDOMKEY'); if key then redis.call('DEL', key) end; return key";
 
-    std::unique_ptr<sw::redis::Redis> connexion;
+    std::unique_ptr<_RedisPlusPlusBny> connexion;
 
   public:
 
@@ -34,12 +33,12 @@ class Redis
 
     Redis()
     {
-        this->connexion = std::make_unique<sw::redis::Redis>("tcp://" + env::GET_REDIS_HOST() + ":" + env::GET_REDIS_PORT());
+        this->connexion = std::make_unique<_RedisPlusPlusBny>("tcp://" + env::GET_REDIS_HOST() + ":" + env::GET_REDIS_PORT());
     }
 
     Redis(std::string host, std::string port)
     {
-        this->connexion = std::make_unique<sw::redis::Redis>("tcp://" + host + ":" + port);
+        this->connexion = std::make_unique<_RedisPlusPlusBny>("tcp://" + host + ":" + port);
     }
 
     void changerBase(Base b)
@@ -57,7 +56,7 @@ class Redis
     std::optional<EvoluablePtr> recuperer()
     {
         Redis::mut.lock();
-        auto key = this->connexion->eval<sw::redis::OptionalString>(this->ATOMIC_POP, {}, {});
+        auto key = this->connexion->eval(this->ATOMIC_POP);
         Redis::mut.unlock();
         if(!key)
             return {};

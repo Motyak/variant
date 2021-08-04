@@ -2,7 +2,6 @@
 #define ENTITE_HPP
 
 #include "Evoluable.hpp"
-#include "Redis.hpp"
 
 #include <cereal/types/string.hpp>
 
