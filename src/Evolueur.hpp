@@ -36,7 +36,10 @@ class Evolueur
 
             /* push split ou forme finale */
             auto split = (*ev)->split();
-            redis << (split?*split:Redis::Outputs{*ev});
+            if(split)
+                redis << *split;
+            else
+                redis << Redis::Output{*ev};
 
             // suppression du fichier temp
             std::experimental::filesystem::remove(FILENAME);

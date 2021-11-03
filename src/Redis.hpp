@@ -23,23 +23,19 @@ class Redis
         OUTPUTS
     };
 
-    // on peut insérer Outputs dans Redis pour push dans la base outputs
-    struct Outputs
+    // on peut insérer Output dans Redis pour push dans la base outputs
+    struct Output
     {
-        std::vector<EvoluablePtr> evs;
-        Outputs(EvoluablePtr ev) : evs({ev}){}
-        Outputs(std::vector<EvoluablePtr> evs) : evs(evs){}
+        EvoluablePtr ev;
+        Output(EvoluablePtr ev) : ev(ev){}
     };
-
-    Redis()
-    {
-        this->connexion = std::make_unique<_RedisPlusPlusBny>("tcp://" + env::GET_REDIS_HOST() + ":" + env::GET_REDIS_PORT());
-    }
 
     Redis(std::string host, std::string port)
     {
         this->connexion = std::make_unique<_RedisPlusPlusBny>("tcp://" + host + ":" + port);
     }
+    
+    Redis() : Redis(env::GET_REDIS_HOST(), env::GET_REDIS_PORT()){}
 
     void changerBase(Base b)
     {
@@ -79,10 +75,10 @@ Redis& operator<<(Redis& redis, const std::vector<EvoluablePtr>& evs)
     return redis;
 }
 
-Redis& operator<<(Redis& redis, const Redis::Outputs& out)
+Redis& operator<<(Redis& redis, const Redis::Output& out)
 {
     redis.changerBase(Redis::OUTPUTS);
-    redis << out.evs;
+    redis << out.ev;
     redis.changerBase(Redis::INPUTS); // on remet par défaut
     return redis;
 }
