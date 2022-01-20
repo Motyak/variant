@@ -1,5 +1,5 @@
-#ifndef EVOLUABLE_HPP
-#define EVOLUABLE_HPP
+#ifndef EVOLUABLE_H
+#define EVOLUABLE_H
 
 #include <cereal/types/polymorphic.hpp>
 #include <cereal/archives/binary.hpp>
@@ -14,7 +14,7 @@ using OptionalEvoluablePtrs = std::optional<std::vector<EvoluablePtr>>;
 struct Evoluable
 {
     virtual bool evoluer() = 0;
-    virtual OptionalEvoluablePtrs split() { return {}; }
+    virtual OptionalEvoluablePtrs split();
 
     template<typename... Types>
     struct Forme
@@ -22,26 +22,15 @@ struct Evoluable
         std::variant<Types...> forme;
 
         Forme() = default;
-        Forme(const std::variant<Types...>& formeInitiale) : forme(formeInitiale){}
+        Forme(const std::variant<Types...>& formeInitiale);
 
         template<class Archive>
-        void serialize(Archive& ar) { ar(forme); }
+        void serialize(Archive& ar);
     };
 };
 CEREAL_REGISTER_TYPE(Evoluable);
 
-std::ostream& operator<<(std::ostream& os, const EvoluablePtr& ev)
-{
-    cereal::BinaryOutputArchive oarchive(os);
-    oarchive(ev);
-    return os;
-}
-
-std::istream& operator>>(std::istream& is, EvoluablePtr& ev)
-{
-    cereal::BinaryInputArchive iarchive(is);
-    iarchive(ev);
-    return is;
-}
+std::ostream& operator<<(std::ostream& os, const EvoluablePtr& ev);
+std::istream& operator>>(std::istream& is, EvoluablePtr& ev);
 
 #endif

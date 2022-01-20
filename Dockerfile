@@ -2,9 +2,7 @@ FROM alpine:3.13
 
 ADD src src
 
-RUN apk add --no-cache g++ && \
-    apk add --no-cache make && \
-    apk add --no-cache cmake && \
+RUN apk add --no-cache g++ make cmake&& \
     mkdir -p usr/local/include && \
     cp -r src/cereal/include/cereal usr/local/include/cereal && \
     cd src/hiredis && \

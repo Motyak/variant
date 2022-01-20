@@ -1,6 +1,6 @@
-#include "Redis.hpp"
-#include "Entite.hpp"
-#include "Evolueur.hpp"
+#include <Redis.h>
+#include <Evolueur.h>
+#include <Entite.hpp>
 
 #include <csignal>
 
@@ -20,7 +20,7 @@ Redis& operator<<(Redis& redis, std::variant<Entite,Entite2> e)
     }, e);
 }
 
-// g++ -std=c++17 src/main.cpp -o evolueur -lredis++ -lhiredis -lstdc++fs -pthread 
+// g++ -o evolueur src/main.cpp lib/libevo.so --std=c++17 -I include -lstdc++fs -pthread
 int main()
 {
     /* ECRITURE */
