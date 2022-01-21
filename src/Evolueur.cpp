@@ -1,5 +1,8 @@
 #include <Evolueur.h>
 
+#include <Evoluable.hpp>
+#include <Redis.h>
+
 #include <fstream>
 
 void Evolueur::callbackFn(int threadId)

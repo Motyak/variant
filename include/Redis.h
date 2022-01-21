@@ -2,7 +2,7 @@
 #define REDIS_H
 
 #include <env.h>
-#include <Evoluable.h>
+#include <Evoluable.hpp>
 
 #include <sw/redis++/redis++.h>
 

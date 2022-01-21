@@ -1,9 +1,6 @@
 #ifndef EVOLUEUR_H
 #define EVOLUEUR_H
 
-#include <Evoluable.h>
-#include <Redis.h>
-
 #include <thread>
 #include <experimental/filesystem>
 
