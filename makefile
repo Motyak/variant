@@ -25,5 +25,7 @@ clean:
 mrproper:
 	rm -rf $(DIRS)
 
+.PHONY: clean mrproper
+
 # will create all necessary directories after the Makefile is parsed
 $(shell mkdir -p $(DIRS))
